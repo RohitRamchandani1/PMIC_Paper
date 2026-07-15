@@ -235,7 +235,13 @@ Figure. 4 illustrates the simultaneous measurement of the two voltage rails on t
 
 **Figure. 4.** Run Mode rail voltages on the STM32MP135F-DK board. Channel 1(VDD DDR): 1.31 V mean. Channel 2(VDD Core): 1.20 V mean.
 
-### B. LPLV-Stop Mode
+### B. Sleep
+
+### C. Stop
+
+### D. LP-Stop Mode
+
+### E. LPLV-Stop Mode
 
 Figure 5. illustrates the behavior of the voltage rails after the BSP transitions the STM32MP135F-DK board to LPLV-Stop Mode. Observed oscilloscope readings show that the mean voltage on Channel 1 (VDDCORE) is approximately 1.31 V and the reduced mean voltage on Channel 2 (DDR) is approximately 842 mV. It can be observed that both the channels trace clean and flat DC lines with no oscillation or visible instability across the captured interval. Both the vertical channels are configured to a scale of 1.00 V/div with a bandwidth limit of 250MHz to accurately capture this low power state, while ensuring a stable measurement sweep the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s.
 
@@ -252,7 +258,10 @@ Figure 5. illustrates the behavior of the voltage rails after the BSP transition
 
 **Figure. 6.** Oscilloscope readings of VDDCORE  and DDR power rail voltages under LPLV-Stop Mode.
 
-### C. Standby Mode
+
+
+
+### F. Standby Mode
 
 Figure. 6 shows both channels at near-zero levels in Standby Mode. The values measured fall in the range of −25 mV to −35 mV on both channels. These values lie within the oscilloscope measurement baseline and indicate that the probed rails are deactivated in this state. Retention or backup supply rails present on the board are outside the two measured channels and are not characterized here.
 
@@ -264,7 +273,7 @@ Figure. 6 shows both channels at near-zero levels in Standby Mode. The values me
 
 **Figure. 8.** Standby Mode rail voltages. Both channels: −25 mV to −35 mV, within the oscilloscope noise floor.
 
-### D. Switch-Off Mode
+### G. Switch-Off Mode
 
 Figure. 7 shows near-zero measured voltage on both channels in Switch-Off Mode. No distinguishable ripple or switching activity is present on the measured outputs.
 
@@ -276,7 +285,7 @@ Figure. 7 shows near-zero measured voltage on both channels in Switch-Off Mode. 
 
 **Figure. 10.** Switch-Off Mode rail voltages. Both channels near zero; no ripple detected on measured outputs.
 
-### E. Summary of Observed Rail Voltages
+### H. Summary of Observed Rail Voltages
 
 Table I reports the mean rail voltages recorded from the oscilloscope captures. Only values present in the source measurements are included. Ripple amplitude, voltage transition duration, wake latency, and current consumption were not measured in this study and are omitted.
 
@@ -315,7 +324,7 @@ The four captured modes—Run, LPLV-Stop, Standby, and Switch-Off—show that th
 
 **Transition behavior.** The captures show only steady-state behavior before and after mode transitions. The Run-to-LPLV-Stop voltage transition waveform—including step amplitude, overshoot, and settling time—is not captured. > **TODO:** Transition duration is the primary latency cost of DVS operation. Without a cursor-measured transition waveform, no timing claim about the DVS step can be made.
 
-**Debugger connection state.** If the ST-LINK debugger was connected during measurement, it may have held debug power domains active and prevented the CPU from reaching the target low-power state. This condition must be disclosed, as measurements taken with an attached debugger may not represent production-representative power behavior.
+**Boot configuration state.** The binary was flashed directly to the SD card sector 128 using a hex editor (such as HxD) and booted independently, hence the hardware operated without any host-debugger interface i.e. without any ST-Link. Testing without the ST-Link Debugger ensured that the CPU reaches its true low power states which were targeted, resulting in accurately representinf the production power behavior.
 
 The results support the following bounded conclusion: the BSP-controlled STPMIC1/1L driver produces software-selectable, distinct rail states across the four evaluated modes on the STM32MP135F-DK board. The scope of valid inference from the current data is limited to (1) Channel 2 voltage is reduced from 1.20 V to 842 mV when the BSP enters LPLV-Stop Mode, as observed in a single oscilloscope capture; and (2) both measured rails are deactivated in Standby and Switch-Off modes, as observed in single captures. Quantified energy savings, ripple characterization, transition timing, wake latency, and full seven-mode coverage each require additional measurements before they can be claimed.
 
