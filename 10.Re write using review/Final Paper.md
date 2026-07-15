@@ -206,26 +206,26 @@ The available measurements support a voltage-focused comparison. Current consump
 ### Oscilloscope Configuration and Capture Parameters
 
 
-| Parameter | Run Mode | LPLV Stop | StandBy | LPStop | Sleep | Stop | Switch-Off |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Ch 1 Hardware Rail** | VDD_DDR | VDD_DDR | VDD_DDR | VDD_DDR | VDD_DDR | VDD_DDR | VDD_DDR |
-| **Ch 2 Hardware Rail** | VDDCORE | VDDCORE | VDDCORE | VDDCORE | VDDCORE | VDDCORE | VDDCORE |
-| **Probe Model (Ch1/Ch2)** | TPP0100 | TPP0100 | TPP0100 | TPP0100 | TPP0100 | TPP0100 | TPP0100 |
-| **Attenuation Ratio** | 10:1 | 10:1 | 10:1 | 10:1 | 10:1 | 10:1 | 10:1 |
-| **Input Coupling** | DC | DC | DC | DC | DC | DC | DC |
-| **Bandwidth Limit** | 250 MHz | 250 MHz | 250 MHz | 250 MHz | 250 MHz | 250 MHz | 250 MHz |
-| **Voltage per Division** | 1.00 V/div | 1.00 V/div | 1.00 V/div | 1.00 V/div | 1.00 V/div | 1.00 V/div | 1.00 V/div |
-| **Time per Division** | 1.00 s/div | 1.00 s/div | 1.00 s/div | 1.00 s/div | 1.00 s/div | 1.00 s/div | 1.00 s/div |
-| **Sampling Rate** | 1.00 kS/s | 1.00 kS/s | 1.00 kS/s | 1.00 kS/s | 1.00 kS/s | 1.00 kS/s | 1.00 kS/s |
-| **Run Mode / Acquisition**| High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) |
-| **Ch 1 Mean Volt (VDD_DDR)** | 1.224 V | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* |
-| **Ch 2 Mean Volt (VDDCORE)** | 1.311 V | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* |
-| **Trigger Source** | Channel 1 | *[Ch 1/2]* | *[Ch 1/2]* | *[Ch 1/2]* | *[Ch 1/2]* | *[Ch 1/2]* | *[Ch 1/2]* |
-| **Trigger Level** | 0.00 V (Rising) | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* | *[Enter Volt]* |
+| Parameter 							| Run Mode          | LPLV Stop  		| StandBy 	 		| StandBy-SR 		| LPStop  	 		| Sleep   	 		| Stop       		| Switch-Off 		|
+| :--- 									| :--- 	            | :---       		| :---    	 		| :---       		| :---    	 		| :---    	 		| :---       		| :---       		|
+| **Ch 1 Hardware Rail** 				| VDD_DDR           | VDD_DDR    		| VDD_DDR 	 		| VDD_DDR 			| VDD_DDR 	 		| VDD_DDR 	 		| VDD_DDR    		| VDD_DDR    		|
+| **Ch 2 Hardware Rail** 				| VDDCORE           | VDDCORE    		| VDDCORE 	 		| VDDCORE 			| VDDCORE 	 		| VDDCORE 	 		| VDDCORE    		| VDDCORE    		|
+| **Probe Model (Ch1/Ch2)** 			| TPP0100           | TPP0100    		| TPP0100 	 		| TPP0100 			| TPP0100 	 		| TPP0100 	 		| TPP0100    		| TPP0100    		|
+| **Attenuation Ratio** 				| 10:1              | 10:1       		| 10:1 		 		| 10:1 				| 10:1    	 		| 10:1    	 		| 10:1       		| 10:1       		|
+| **Input Coupling** 					| DC                | DC         		| DC 		 		| DC 				| DC      	 		| DC      	 		| DC         		| DC         		|
+| **Bandwidth Limit** 					| 250 MHz           | 250 MHz    		| 250 MHz    		| 250 MHz           | 250 MHz 	 		| 250 MHz 	 		| 250 MHz    		| 250 MHz    		|
+| **Voltage per Division** 				| 1.00 V/div        | 1.00 V/div 		| 1.00 V/div 		| 1.00 V/div        | 1.00 V/div 		| 1.00 V/div 		| 1.00 V/div 		| 1.00 V/div 		|
+| **Time per Division** 				| 1.00 s/div        | 1.00 s/div 		| 1.00 s/div 		| 1.00 s/div        | 1.00 s/div 		| 1.00 s/div 		| 1.00 s/div 		| 1.00 s/div 		|
+| **Sampling Rate** 					| 1.00 kS/s         | 1.00 kS/s  		| 1.00 kS/s  		| 1.00 kS/s         | 1.00 kS/s  		| 1.00 kS/s  		| 1.00 kS/s  		| 1.00 kS/s         |
+| **Run Mode / Acquisition**			| High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) |
+| **Ch 1 Mean Volt (VDD_DDR)** 			| 1.224 V           | *[Enter Volt]*    | *[Enter Volt]* 	| *[Enter Volt]*    | *[Enter Volt]*    | *[Enter Volt]*    | *[Enter Volt]* 	| *[Enter Volt]*    |
+| **Ch 2 Mean Volt (VDDCORE)** 			| 1.311 V           | *[Enter Volt]*    | *[Enter Volt]* 	| *[Enter Volt]*    | *[Enter Volt]*    | *[Enter Volt]*    | *[Enter Volt]* 	| *[Enter Volt]*	|
+| **Trigger Source** 					| Channel 1         | *[Ch 1/2]*        | *[Ch 1/2]*     	| *[Ch 1/2]*        | *[Ch 1/2]*        | *[Ch 1/2]*        | *[Ch 1/2]*     	| *[Ch 1/2]*        |
+| **Trigger Level** 					| 0.00 V (Rising)   | *[Enter Volt]*    | *[Enter Volt]* 	| *[Enter Volt]*    | *[Enter Volt]*    | *[Enter Volt]*    | *[Enter Volt]* 	| *[Enter Volt]* 	|
 
 ## VII. Measurement Results
 
-### A. Run Mode
+### A. Run/Sleep/Stop/LP-Stop Mode
 
 Figure. 4 illustrates the simultaneous measurement of the two voltage rails on the STM32MP135F-DK board during Run Mode. The oscilloscope reports a mean voltage of roughly 1.20 V on Channel 1 (DDR) and approximately 1.31 V on Channel 2 (VDDCORE), with both channels remaining stable as flat DC signals near their respective mean values throughout the captured interval. To capture these waveforms, both vertical channels are configured to a scale of 1.00 V/div with a 250 MHz bandwidth limit, while the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s to monitor long term rail stability.
 
@@ -233,13 +233,9 @@ Figure. 4 illustrates the simultaneous measurement of the two voltage rails on t
 
 ![Run Mode rail waveform](./04.Run_Mode.png)
 
+- Write the Peak-Peak value calculated.
+
 **Figure. 4.** Run Mode rail voltages on the STM32MP135F-DK board. Channel 1(VDD DDR): 1.31 V mean. Channel 2(VDD Core): 1.20 V mean.
-
-### B. Sleep
-
-### C. Stop
-
-### D. LP-Stop Mode
 
 ### E. LPLV-Stop Mode
 
@@ -258,9 +254,6 @@ Figure 5. illustrates the behavior of the voltage rails after the BSP transition
 
 **Figure. 6.** Oscilloscope readings of VDDCORE  and DDR power rail voltages under LPLV-Stop Mode.
 
-
-
-
 ### F. Standby Mode
 
 Figure. 6 shows both channels at near-zero levels in Standby Mode. The values measured fall in the range of −25 mV to −35 mV on both channels. These values lie within the oscilloscope measurement baseline and indicate that the probed rails are deactivated in this state. Retention or backup supply rails present on the board are outside the two measured channels and are not characterized here.
@@ -273,7 +266,13 @@ Figure. 6 shows both channels at near-zero levels in Standby Mode. The values me
 
 **Figure. 8.** Standby Mode rail voltages. Both channels: −25 mV to −35 mV, within the oscilloscope noise floor.
 
-### G. Switch-Off Mode
+### G. Standby SR Mode
+
+![Standby Mode SR rail waveform transition](07.Stand_By_SR_Mode_Transition.png)
+
+![Standby Mode SR rail waveform](08.Stand_By_SR_Mode.png)
+
+### H. Switch-Off Mode
 
 Figure. 7 shows near-zero measured voltage on both channels in Switch-Off Mode. No distinguishable ripple or switching activity is present on the measured outputs.
 
@@ -285,22 +284,35 @@ Figure. 7 shows near-zero measured voltage on both channels in Switch-Off Mode. 
 
 **Figure. 10.** Switch-Off Mode rail voltages. Both channels near zero; no ripple detected on measured outputs.
 
-### H. Summary of Observed Rail Voltages
+### I. Summary of Observed Rail Voltages
 
 Table I reports the mean rail voltages recorded from the oscilloscope captures. Only values present in the source measurements are included. Ripple amplitude, voltage transition duration, wake latency, and current consumption were not measured in this study and are omitted.
 
-**Table I — Observed Rail Voltages Across Evaluated PMIC Power Modes**
+**Table III — Observed Rail Voltages Across Evaluated PMIC Power Modes**
+| Mode | Channel 1 mean (VDD DDR) | Channel 2 mean (VDD Core) | Observed rail state |
+|---|---:|---:|---|
+| Run/Sleep/Stop/LP-Stop | ≈ 1.31 | ≈ 1.20 | Both rails active; no instability in captured interval. |
+| LPLV-Stop | ≈ 1.31 | ≈ 0.842 | Channel 1 reduced; Channel 2 unchanged. |
+| Standby-SR | ≈ 1.31 | −0.025 to −0.035 | Both rails at oscilloscope noise floor; rails deactivated. |
+| Standby | −0.025 to −0.035 | −0.025 to −0.035 | Both rails at oscilloscope noise floor; rails deactivated. |
+| Switch-Off | ≈ 0 | ≈ 0 | Both rails deactivated; no switching activity on measured outputs. |
 
-**Table III — Commanded Versus Measured Voltage for Probed Rails (Table I Mapping)**
 
-| Mode | Channel 1 rail | Ch1 target (V) | Ch1 measured (V) | Ch1 dev. (mV) | Ch1 dev. (%) | Channel 2 rail | Ch2 target (V) | Ch2 measured (V) | Ch2 dev. (mV) | Ch2 dev. (%) |
+**Table IV — Commanded Versus Measured Voltage for Probed Rails (Table I Mapping)**
+
+| Mode | Channel 1 rail | Ch1 target (VDD DDR) | Ch1 measured (VDD DDR) | Ch1 dev. (mV) | Ch1 dev. (%) | Channel 2 rail | Ch2 target (V) | Ch2 measured (V) | Ch2 dev. (mV) | Ch2 dev. (%) |
 |---|---|---:|---:|---:|---:|---|---:|---:|---:|---:|
-| Run/Sleep/Stop | BUCK1 / VDDCORE | 1.25 | 1.20 | −50 | −4.0 | BUCK2 / VDD_DDR | 1.35 | 1.31 | −40 | −3.0 |
-| LP-Stop | BUCK1 / VDDCORE | 1.25 | N/A | N/A | N/A | BUCK2 / VDD_DDR | 1.35 | N/A | N/A | N/A |
-| LPLV-Stop | BUCK1 / VDDCORE | 0.90 | 0.842 | −58 | −6.4 | BUCK2 / VDD_DDR | 1.35 | 1.31 | −40 | −3.0 |
-| Standby, DDR self-refresh | BUCK1 / VDDCORE | OFF | N/A | N/A | N/A | BUCK2 / VDD_DDR | 1.35 | N/A | N/A | N/A |
+| Run/Sleep/Stop/LP-Stop | BUCK1 / VDDCORE | 1.35 | 1.31 | −40 | −3.0 | BUCK2 / VDD_DDR | 1.25 | 1.20 | −50 | −4.0 |
+| LPLV-Stop | BUCK1 / VDDCORE | 1.35 | 1.31 | −40 | −3.0 | BUCK2 / VDD_DDR | 0.90 | 0.842 | −58 | −6.4 |
+| Standby, DDR self-refresh | BUCK1 / VDDCORE | 1.35 | N/A | N/A | N/A | BUCK2 / VDD_DDR | OFF | N/A | N/A | N/A |
 | Standby, DDR off | BUCK1 / VDDCORE | OFF | −0.025 to −0.035 | N/A | N/A | BUCK2 / VDD_DDR | OFF | −0.025 to −0.035 | N/A | N/A |
+| Switch-Off | BUCK1 / VDDCORE | OFF | −0.025 to −0.035 | N/A | N/A | BUCK2 / VDD_DDR | OFF | −0.025 to −0.035 | N/A | N/A |
 
+**Table V (Comprehensive Mode Characterization).**
+1. Peak-Peak Value average of 5 values for Run Mode is 24.71 for VDD CORE and 22.98 for VDD DDR.
+2. Peak-Peak Value average of 5 values for LPLV Stop Mode is 23.96 for VDD CORE and 23.72 for VDD DDR.
+3. Peak-Peak Value average of 5 values for Stand By Mode is 24.68 for VDD CORE and 25.76 for VDD DDR.
+4. Peak-Peak Value average of 5 values for Stand By SR is 24.32 for VDD CORE and 24.80 for VDD DDR.
 
 > **TODO — Table II (Commanded vs. Measured Voltage).** When BSP register targets are available, add a table with columns: Mode, Channel, PMIC output name (BUCK/LDO), BSP-programmed target voltage (V), oscilloscope-measured mean (V), and deviation (mV and %). This table is the minimum evidence required to substantiate the DVS accuracy claim.
 
