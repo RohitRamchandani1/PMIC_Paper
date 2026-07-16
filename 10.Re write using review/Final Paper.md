@@ -1,30 +1,30 @@
-# Software-Controlled Dynamic Voltage Scaling Using the STPMIC1L PMIC for STM32MP1-Based Embedded Systems
+# Software-Controlled Dynamic Voltage Scaling Using the STPMIC1/1L PMIC for STM32MP1-Based Embedded Systems
 
 ## Abstract
-Highly integrated modern embedded processors require multiple regulated voltage domains, deterministic power sequencing and software driven transitions between operating states. Although discrete regulator-based power architecture can fulfill basic requirements of supply, but it can only offer a limited amount of across rail coordination. Discrete regulator-based power supply can complicate runtime voltage control when the system complexity increases. In this paper an experimental evaluation of software driven power state management is presented using the STPMIC1L Power Management Integrated Circuits (PMIC) on the STM32MP135F-DK microprocessor. STM32Cube’s bare metal firmware environment along with the Board Support Package (BSP) PMIC API’s are used for the implementation and demonstration. BSP PMIC API’s are used to initialize the PMIC, configure voltage rails and enter the Run, Sleep, Stop, Low Power Stop(LP Stop), Low Power Low Voltage Stop(LPLV Stop), StandBy, and Switch Off States. Oscilloscope readings demonstrate that the Run Mode maintains the rails measured close to 1.31V and 1.20V, while LPLV Stop lowers the second measured rail to 842mV approximately while keeping the measured rail close to 1.31V. Standby and Switch Off measurement results demonstrate the rails collapse to the noise floor of the oscilloscope. The results demonstrate that the STPMIC1L BSP controlled PMIC path is able to perform stable software driven voltage scaling. It also shows the controlled rail shutdown on the STM32MP1 system.
+Highly integrated modern embedded processors require multiple regulated voltage domains, deterministic power sequencing and software driven transitions between operating states. Although discrete regulator-based power architecture can fulfill basic requirements of supply, but it can only offer a limited amount of across rail coordination. Discrete regulator-based power supply can complicate runtime voltage control when the system complexity increases. In this paper an experimental evaluation of software driven power state management is presented using the STPMIC1/1L Power Management Integrated Circuits (PMIC) on the STM32MP135F-DK microprocessor. STM32Cube’s bare metal firmware environment along with the Board Support Package (BSP) PMIC API’s are used for the implementation and demonstration. BSP PMIC API’s are used to initialize the PMIC, configure voltage rails and enter the Run, Sleep, Stop, Low Power Stop(LP Stop), Low Power Low Voltage Stop(LPLV Stop), StandBy, and Switch Off States. Oscilloscope readings demonstrate that the Run Mode maintains the rails measured close to 1.31V and 1.20V, while LPLV Stop lowers the second measured rail to 842mV approximately while keeping the measured rail close to 1.31V. Standby and Switch Off measurement results demonstrate the rails collapse to the noise floor of the oscilloscope. The results demonstrate that the STPMIC1/1L BSP controlled PMIC path is able to perform stable software driven voltage scaling. It also shows the controlled rail shutdown on the STM32MP1 system.
 
 ## Keywords
-Dynamic Voltage Scaling, Power Management Integrated Circuit, STPMIC1L, STM32MP1, Low Power Modes, Embedded Systems, I2C, BSP
+Dynamic Voltage Scaling, Power Management Integrated Circuit, STPMIC1, STPMIC1L, STM32MP1, Low Power Modes, Embedded Systems, I2C, BSP
 
 ## I. Introduction
 Embedded systems increasingly rely on heterogeneous processors, high speed interfaces, memory subsystems, and mixed signal peripherals that operate from multiple voltage domains. While it is possible to provision these domains with standalone discrete regulators, but this adds complexity at board level, and the sequencing, fault handling, and runtime voltage coordination is spread across several separate devices. In energy constrained platforms these constraints are more critical where the system needs to reduce voltage and disable rails during the low power states without altering the rail stability or wake up behavior.
 
-These problems are addressed by integrating Low Dropout regulators (LDOs), DC-DC converters, load switches, sequencing logic, and digital control interfaces into a single coordinated power device in multi-output PMICs. STPMIC1L provides PMIC architecture for STM32MP1 class microprocessor units (MPUs), which are configured through I2C and managed through the firmware on board level. This functionality enables the software to participate directly in power state transitions rather than treating voltage regulation as a fixed hardware function.
+These problems are addressed by integrating Low Dropout regulators (LDOs), DC-DC converters, load switches, sequencing logic, and digital control interfaces into a single coordinated power device in multi-output PMICs. STPMIC1 and STPMIC1L provide PMIC architecture for STM32MP1 class microprocessor units (MPUs), which are configured through I2C and managed through the firmware on board level. This functionality enables the software to participate directly in power state transitions rather than treating voltage regulation as a fixed hardware function.
 
 This paper demonstrates that PMICs can provide regulated supplies through the software controlled PMIC path, during the practical low power transitions on STM32MP1 which is an STM32 MPU’s evaluation platform. This paper also provides evidence that BSP-level API’s can configure rails, apply Dynamic Voltage Scaling (DVS), and transition between Run, Low-Power, and Shutdown states while maintaining observable rail stability.
-This paper demonstrates this using a structured implementation and measurement study of the STPMIC1L driver path on the STM32MP135F-DK discovery kit. The contributions of this study are that it documents a bare-metal STM32Cube PMIC control flow using BSP initialization, rail configuration, and power-mode transition APIs. It experimentally characterizes the measured rail behavior in Run, LPLV-Stop, Standby, and Switch-Off modes using oscilloscope captures. It separates software implementation behavior from measurement results and discussion, providing a clearer basis for evaluating PMIC-assisted low-power design on STM32MP1-based systems.
+This paper demonstrates this using a structured implementation and measurement study of the STPMIC1/1L driver path on the STM32MP135F-DK discovery kit. The contributions of this study are that it documents a bare-metal STM32Cube PMIC control flow using BSP initialization, rail configuration, and power-mode transition APIs. It experimentally characterizes the measured rail behavior in Run, LPLV-Stop, Standby, and Switch-Off modes using oscilloscope captures. It separates software implementation behavior from measurement results and discussion, providing a clearer basis for evaluating PMIC-assisted low-power design on STM32MP1-based systems.
 
 
 ## II. Related Work and Technical Context
 Embedded systems power management approaches have shifted from discrete regulator setups to integrated PMIC based architectures. Multi-rail embedded platforms have been studied before and it has been established that the systems using separate buck converters and LDOs face challenges in board density, thermal distribution, sequencing coordination, and runtime flexibility [1]–[4]. PMIC oriented analysis and application materials demonstrate how integrated regulators, protection logic, and sequencing engines can simplify the power delivery complexity and enhance coordination across rails [5]–[8].
 
-The STPMIC1L family targets STM32MP1 class systems and comprises several DC-DC converters, LDOs, load switches, programmable sequencing, and an I2C control interface [9]–[11]. These capabilities make it ideal for software managed operating states where firmware changes rail configuration based on platform activity.
+The STPMIC1 family targets STM32MP1 class systems and comprises several DC-DC converters, LDOs, load switches, programmable sequencing, and an I2C control interface [9]–[11]. These capabilities make it ideal for software managed operating states where firmware changes rail configuration based on platform activity.
 
-Power management through software is also an important technique in embedded low power design. When workload or retention requirements permit lower voltage or rail shutdown, energy consumption can be reduced through Dynamic voltage and frequency scaling (DVFS) and software controlled low power states [12], [13]. This paper extends this context to the board level PMIC driver path and measured rail behavior during selected low-power transitions on an STM32MP135F-DK platform.
+Power management through software is also an important technique in embedded low power design. When workload or retention requirements permit lower voltage or rail shutdown, energy consumption can be reduced through Dynamic voltage and frequency scaling (DVFS) and software controlled low power states [12]–[15]. This paper extends this context to the board level PMIC driver path and measured rail behavior during selected low-power transitions on an STM32MP135F-DK platform.
 
 ## III. Literature Review
 
-Software-controlled low-power design for embedded systems is supported by prior work on variable-speed scheduling, DVS, DVFS, and DPM [1]–[10]. CMOS dynamic power is approximately proportional to CV_DD^2 f, so voltage reduction is commonly treated as a mechanism for reducing dynamic energy when performance constraints permit it [20], [21].
+Software-controlled low-power design for embedded systems is supported by prior work on variable-speed scheduling, DVS, DVFS, and DPM [1]–[10]. CMOS dynamic power is approximately proportional to CV_DD^2 f, so voltage reduction is commonly treated as a mechanism for reducing dynamic energy when performance constraints permit it [26], [27].
 
 Yao, Demers, and Shenker formalized a scheduling model in which variable processor speed can reduce CPU energy when timing constraints are considered [1]. Pillai and Shin showed that operating-system software can manage dynamic voltage scaling for embedded real-time workloads [2]. Pering, Burd, and Brodersen evaluated DVS algorithms and showed that workload conditions and policy choices affect energy outcomes [3]. Burd, Pering, Stratakos, and Brodersen demonstrated a dynamic-voltage-scaled microprocessor system, supporting the claim that DVS can be implemented in real processor hardware [4].
 
@@ -32,17 +32,19 @@ DPM extends the literature beyond CPU voltage scaling by addressing component an
 
 Embedded and real-time systems require DVFS and DPM claims to be evaluated in relation to timing, workload, and schedulability constraints [8]–[10]. Pouwelse, Langendoen, and Sips evaluated DVS on a low-power microprocessor and supported the claim that practical low-power processors can expose software-controllable voltage-scaling behavior [8]. Zhong and Xu addressed energy-aware modeling and scheduling for real-time tasks under DVS, showing that real-time DVFS evaluation must include task timing and schedulability constraints [9]. Bhatti, Belleudy, and Auguin examined hybrid power management in real-time embedded systems and treated DVFS and DPM as interacting techniques rather than independent optimizations [10]. These sources support a conservative interpretation of STM32MP1 voltage-rail experiments: a voltage trace can support a rail-level DVS observation, but system-level energy claims require measurements and analysis beyond rail voltage alone [3], [7], [9], [10].
 
-The STM32MP1 platform introduces a multi-domain power-control context for PMIC-based experiments [11], [12]. STMicroelectronics documentation describes STM32MP1-class MPUs as Arm-based 32-bit devices with platform-level power-control and low-power-mode architecture that software must coordinate [11], [12]. The STM32MP135F-DK board documentation identifies the STM32MP135FA MPU, STPMIC1L PMIC, DDR3L memory, USB, Ethernet, wireless connectivity, and onboard current-measurement support as board-level features [13]. This documentation supports using the STM32MP135F-DK as a relevant target for PMIC-controlled STM32MP13x experiments, but it does not by itself establish whole-board energy reduction [13].
+The STM32MP1 platform introduces a multi-domain power-control context for PMIC-based experiments [11], [12]. STMicroelectronics documentation describes STM32MP1-class MPUs as Arm-based 32-bit devices with platform-level power-control and low-power-mode architecture that software must coordinate [11], [12]. The STM32MP135F-DK board documentation identifies the STM32MP135FA MPU, STPMIC1 PMIC, DDR3L memory, USB, Ethernet, wireless connectivity, and onboard current-measurement support as board-level features [13]. This documentation supports using the STM32MP135F-DK as a relevant target for PMIC-controlled STM32MP13x experiments, but it does not by itself establish whole-board energy reduction [13].
 
-STPMIC1L documentation supports claims about a newer ST PMIC option for STM32MP1x applications [14]–[19]. ST describes the STPMIC1L as a power-management IC for MPUs with two buck converters, four LDOs, programmable non-volatile memory, I2C and digital I/O control, programmable output voltages, programmable turn-on and turn-off sequences, and immediate alternate output settings through dedicated power-control pins [14]. STPMIC1L application notes provide official STM32MP13 wall-adapter guidance, non-volatile-memory configuration information, application hints, bill-of-material details, and PCB layout guidelines [15]–[19]. These documents support claims about STPMIC1L rail programmability, sequencing support, configuration, external-component requirements, and layout-dependent regulator integration [14]–[19].
-Taken together, the reviewed sources support a careful framing of the STM32MP1/STPMIC1L paper [1]–[19]. Research analysis for DVS, DVFS, and DPM confirms the importance of software regulated voltage scaling, power state control, workload aware policy, and timing aware evaluation [1]–[10].
+STPMIC1 documentation provides the PMIC-specific basis for host-controlled power management on STM32MP1-class systems [14]–[19]. The STPMIC1 datasheet describes a highly integrated PMIC for microprocessor units with multiple buck converters, LDOs, boost and power-switch functions, programmable non-volatile memory, and I2C/digital I/O control [14]. The STPMIC1 I2C programming guide supports claims about software-visible PMIC control through an I2C programming model [15]. ST application notes provide integration guidance for STM32MP151/153/157 battery-powered applications, STM32MP13x wall-adapter-powered applications using STPMIC1 variants, STPMIC1 auto turn-on behavior, and STPMIC1 PCB layout practice [16]–[19]. These sources support claims about STPMIC1 integration paths, sequencing-related behavior, and board-design requirements, but they remain vendor documentation rather than peer-reviewed evidence [14]–[19].
 
-The hardware, described in the STM32MP1/STPMIC1L-class hardware documentation, board documents, datasheets, and application notes provides PMIC, rail-control, sequencing, low-power-mode, and integration mechanisms that can be employed for software regulated experiments [11]–[19]. However, the same set of source does not support the claim that voltage measurements alone are sufficient to demonstrate system-level energy savings, because the listed sources associate energy outcomes with workload behavior, timing constraints, idle intervals, state-transition costs, and broader DVFS/DPM interactions [3], [6], [7], [9], [10].
+STPMIC1L documentation supports claims about a newer ST PMIC option for STM32MP1x applications [20]–[25]. ST describes the STPMIC1L as a power-management IC for MPUs with two buck converters, four LDOs, programmable non-volatile memory, I2C and digital I/O control, programmable output voltages, programmable turn-on and turn-off sequences, and immediate alternate output settings through dedicated power-control pins [20]. STPMIC1L application notes provide official STM32MP13 wall-adapter guidance, non-volatile-memory configuration information, application hints, bill-of-material details, and PCB layout guidelines [21]–[25]. These documents support claims about STPMIC1L rail programmability, sequencing support, configuration, external-component requirements, and layout-dependent regulator integration [20]–[25].
+Taken together, the reviewed sources support a careful framing of the STM32MP1/STPMIC1 paper [1]–[25]. Research analysis for DVS, DVFS, and DPM confirms the importance of software regulated voltage scaling, power state control, workload aware policy, and timing aware evaluation [1]–[10].
+
+The hardware, described in the STM32MP1/STPMIC1-class hardware documentation, board documents, datasheets, and application notes provides PMIC, rail-control, sequencing, low-power-mode, and integration mechanisms that can be employed for software regulated experiments [11]–[25]. However, the same set of source does not support the claim that voltage measurements alone are sufficient to demonstrate system-level energy savings, because the listed sources associate energy outcomes with workload behavior, timing constraints, idle intervals, state-transition costs, and broader DVFS/DPM interactions [3], [6], [7], [9], [10].
 
 ## IV. System Platform and PMIC Architecture
 
 ### A. Hardware Platform
-STM32MP135F-DK discovery kit is used as an experimental platform, the main processing of which is a Cortex A7 STM32MP1 MPU. The board is powered by a STPMIC1L PMIC connected via an I2C Instance. The PMIC provides the main MPU voltage domains with BUCK regulators, LDOs, and load switches. Outputs associated with system domains are included in the measured rails like processing core, DDR interface, GPIO banks, communication peripherals, and internal analog circuitry.
+STM32MP135F-DK discovery kit is used as an experimental platform, the main processing of which is a Cortex A7 STM32MP1 MPU. The board is powered by a STPMIC1 or STPMIC1L PMIC connected via an I2C Instance. The PMIC provides the main MPU voltage domains with BUCK regulators, LDOs, and load switches. Outputs associated with system domains are included in the measured rails like processing core, DDR interface, GPIO banks, communication peripherals, and internal analog circuitry.
 
 The PMIC integrates voltage generation and sequencing, enabling startup, voltage scaling, low-power entry, and rail shutdown to be coordinated via PMIC configuration and firmware level control. The external rail behavior was measured using a Tektronix Mixed Domain Oscilloscope.
 
@@ -146,9 +148,9 @@ The BSP hierarchy provides the firmware entry points used for PMIC control:
 
 The platform powers up in Run Mode by default. Before entering deeper low-power states, wake-up sources must be configured so that the system can return to Run Mode after the low-power interval. The PMIC power-management flow is summarized in Figure. 2.
 
-<img src="01.Software_Setup.png" height=600px alt="STPMIC1L BSP power-management flow">
+<img src="01.Software_Setup.png" height=600px alt="STPMIC1/1L BSP power-management flow">
 
-**Figure. 2.** BSP-controlled STPMIC1L power-management flow: initialization, low-power entry, wake-up handling, and return to Run Mode.
+**Figure. 2.** BSP-controlled STPMIC1/1L power-management flow: initialization, low-power entry, wake-up handling, and return to Run Mode.
 
 ### C. Power-Mode Sequence
 Each evaluated mode was invoked through the BSP PMIC functions. Voltage transitions were initiated by writing new rail configurations to the PMIC over I2C. For LP-Stop and LPLV-Stop, reduced voltage levels were applied to selected domains to support DVS. Standby and Switch-Off modes were evaluated to observe rail shutdown behavior and residual voltage levels at the oscilloscope inputs.
@@ -158,7 +160,7 @@ Each evaluated mode was invoked through the BSP PMIC functions. Voltage transiti
 sequenceDiagram
 	participant FW as Firmware / BSP
 	participant I2C as I2C4 bus
-	participant PMIC as STPMIC1L
+	participant PMIC as STPMIC1/1L
 	participant Rails as PMIC output rails
 	participant MPU as STM32MP1 domains
 
@@ -335,9 +337,9 @@ Table VI presents a mode-feature matrix for the evaluated operating modes, listi
 
 ## VIII. Discussion
 
-The four captured modes—Run, LPLV-Stop, Standby, and Switch-Off—show that the BSP-controlled STPMIC1L driver produces measurably distinct, software-selectable rail states on the STM32MP135F-DK platform. Channel 1 remains at 1.31 V across Run and LPLV-Stop modes, indicating that the BSP low-voltage stop configuration applies a selective per-rail reduction rather than a platform-wide voltage change. Channel 2 transitions from 1.20 V in Run Mode to 842 mV in LPLV-Stop Mode, a reduction of 358 mV (29.8%). In Standby and Switch-Off modes, both measured rails are deactivated; the residuals of −25 mV to −35 mV on both channels are within the oscilloscope noise floor and do not indicate residual supply activity on the measured outputs.
+The four captured modes—Run, LPLV-Stop, Standby, and Switch-Off—show that the BSP-controlled STPMIC1/1L driver produces measurably distinct, software-selectable rail states on the STM32MP135F-DK platform. Channel 1 remains at 1.31 V across Run and LPLV-Stop modes, indicating that the BSP low-voltage stop configuration applies a selective per-rail reduction rather than a platform-wide voltage change. Channel 2 transitions from 1.20 V in Run Mode to 842 mV in LPLV-Stop Mode, a reduction of 358 mV (29.8%). In Standby and Switch-Off modes, both measured rails are deactivated; the residuals of −25 mV to −35 mV on both channels are within the oscilloscope noise floor and do not indicate residual supply activity on the measured outputs.
 
-**Rail-voltage reduction versus power reduction.** The 29.8% Channel 2 voltage reduction is a rail-level observation. Dynamic CMOS power scales as $P \propto CV^2f$ [20], [21], so a reduction from 1.20 V to 0.842 V would reduce the $V^2$-dependent power component on that rail by approximately 50.6% if load capacitance and switching frequency were held constant. However, no current measurement is reported in this study. Any statement about power or energy reduction would require measured supply current or power-monitor data and must account for load state, regulator efficiency, and retained-domain activity on unmeasured rails. The voltage data alone therefore supports a rail-level DVS observation; it does not support a system-level energy savings claim [3], [7], [9], [10].
+**Rail-voltage reduction versus power reduction.** The 29.8% Channel 2 voltage reduction is a rail-level observation. Dynamic CMOS power scales as $P \propto CV^2f$ [26], [27], so a reduction from 1.20 V to 0.842 V would reduce the $V^2$-dependent power component on that rail by approximately 50.6% if load capacitance and switching frequency were held constant. However, no current measurement is reported in this study. Any statement about power or energy reduction would require measured supply current or power-monitor data and must account for load state, regulator efficiency, and retained-domain activity on unmeasured rails. The voltage data alone therefore supports a rail-level DVS observation; it does not support a system-level energy savings claim [3], [7], [9], [10].
 
 **Channel identity and rail verification.** Channel 1 corresponds to the VDD_DDR rail (BUCK2) and Channel 2 to the VDDCORE rail (BUCK1), as documented in Tables I, II, and IV and derived from the STM32MP135F-DK schematic (UM2993). The LPLV-Stop reduction on Channel 2 is therefore attributed to the VDDCORE/BUCK1 DVS rail; the measured 842 mV deviates by −58 mV (−6.4%) from the 0.9 V BSP-programmed target, consistent with correct DVS operation.
 
@@ -349,7 +351,7 @@ The four captured modes—Run, LPLV-Stop, Standby, and Switch-Off—show that th
 
 **Boot configuration state.** The binary was flashed directly to the SD card sector 128 using a hex editor (such as HxD) and booted independently, hence the hardware operated without any host-debugger interface i.e. without any ST-Link. Testing without the ST-Link Debugger ensured that the CPU reaches its true low power states which were targeted, resulting in accurately representinf the production power behavior.
 
-The results support the following bounded conclusion: the BSP-controlled STPMIC1L driver produces software-selectable, distinct rail states across the four evaluated modes on the STM32MP135F-DK board. The scope of valid inference from the current data is limited to (1) Channel 2 voltage is reduced from 1.20 V to 842 mV when the BSP enters LPLV-Stop Mode, as observed in a single oscilloscope capture; and (2) both measured rails are deactivated in Standby and Switch-Off modes, as observed in single captures. Quantified energy savings, ripple characterization, transition timing, wake latency, and full seven-mode coverage each require additional measurements before they can be claimed.
+The results support the following bounded conclusion: the BSP-controlled STPMIC1/1L driver produces software-selectable, distinct rail states across the four evaluated modes on the STM32MP135F-DK board. The scope of valid inference from the current data is limited to (1) Channel 2 voltage is reduced from 1.20 V to 842 mV when the BSP enters LPLV-Stop Mode, as observed in a single oscilloscope capture; and (2) both measured rails are deactivated in Standby and Switch-Off modes, as observed in single captures. Quantified energy savings, ripple characterization, transition timing, wake latency, and full seven-mode coverage each require additional measurements before they can be claimed.
 
 ## IX. Limitations and Evidence Needed Before Submission
 Several parts of the paper require additional evidence before the work can be submitted as a complete IEEE conference paper:
@@ -360,32 +362,64 @@ Several parts of the paper require additional evidence before the work can be su
 4. Transition-time claims require measured timing values from oscilloscope cursors or logs.
 5. Ripple and noise claims should include quantitative peak-to-peak or RMS values if they are central to the argument.
 6. The exact PMIC rail names, channel-to-rail mapping, load domains, and low-power retention behavior should be documented in a table.
-7. This paper documents only the STPMIC1L device; no STPMIC1 (base variant) claims or references remain in the text.
+7. The distinction between STPMIC1 and STPMIC1L should be clarified if both devices were not physically tested.
 8. The applicability to future STM32 platforms should be either supported by documentation or removed from the core conclusion.
 
 ## X. Conclusion
-This paper presented a software-controlled PMIC power-management implementation for the STM32MP135F-DK platform using the STPMIC1L PMIC. The BSP control path initializes PMIC parameters, configures voltage rails, and transitions the platform through low-power operating states. Oscilloscope measurements show stable Run Mode rail behavior near 1.31 V and 1.20 V, LPLV-Stop voltage reduction of the second measured rail to approximately 842 mV, and measured rail collapse toward the oscilloscope noise floor in Standby and Switch-Off modes. The results support the use of the STPMIC1L and BSP driver path for software-managed voltage scaling and rail shutdown on STM32MP1-based embedded platforms. Future work should add current measurements, transition timing, complete rail mapping, and verified citation support to quantify energy benefits and strengthen conference-paper readiness.
+This paper presented a software-controlled PMIC power-management implementation for the STM32MP135F-DK platform using the STPMIC1/1L PMIC. The BSP control path initializes PMIC parameters, configures voltage rails, and transitions the platform through low-power operating states. Oscilloscope measurements show stable Run Mode rail behavior near 1.31 V and 1.20 V, LPLV-Stop voltage reduction of the second measured rail to approximately 842 mV, and measured rail collapse toward the oscilloscope noise floor in Standby and Switch-Off modes. The results support the use of the STPMIC1/1L and BSP driver path for software-managed voltage scaling and rail shutdown on STM32MP1-based embedded platforms. Future work should add current measurements, transition timing, complete rail mapping, and verified citation support to quantify energy benefits and strengthen conference-paper readiness.
 
 ## References
 
-[1] F. Yao, A. Demers, and S. Shenker, "A scheduling model for reduced CPU energy," in *Proc. IEEE 36th Annu. Found. Comput. Sci.*, 1995, pp. 374–382.
-[2] P. Pillai and K. G. Shin, "Real-time dynamic voltage scaling for low-power embedded operating systems," in *Proc. 18th ACM Symp. Oper. Syst. Princ.*, 2001, pp. 89–102.
-[3] T. Pering, T. Burd, and R. Brodersen, "The simulation and evaluation of dynamic voltage scaling algorithms," in *Proc. Int. Symp. Low Power Electron. Design*, 1998, pp. 76–81.
-[4] T. D. Burd, T. A. Pering, A. J. Stratakos, and R. W. Brodersen, "A dynamic voltage scaled microprocessor system," *IEEE J. Solid-State Circuits*, vol. 35, no. 11, pp. 1571–1580, Nov. 2000.
-[5] L. Benini, A. Bogliolo, and G. De Micheli, "A survey of design techniques for system-level dynamic power management," *IEEE Trans. Very Large Scale Integr. (VLSI) Syst.*, vol. 8, no. 3, pp. 299–316, Jun. 2000.
-[6] T. Simunic, L. Benini, P. Glynn, and G. De Micheli, "Dynamic power management for portable systems," in *Proc. 6th Annu. Int. Conf. Mobile Comput. Netw.*, 2000, pp. 11–19.
-[7] T. Simunic, L. Benini, A. Acquaviva, P. Glynn, and G. De Micheli, "Dynamic voltage scaling and power management for portable systems," in *Proc. 38th Design Autom. Conf.*, 2001.
-[8] J. Pouwelse, K. Langendoen, and H. Sips, "Dynamic voltage scaling on a low-power microprocessor," in *Proc. 7th Annu. Int. Conf. Mobile Comput. Netw.*, 2001, pp. 251–259.
-[9] X. Zhong and C.-Z. Xu, "Energy-aware modeling and scheduling of real-time tasks for dynamic voltage scaling," in *Proc. 26th IEEE Int. Real-Time Syst. Symp.*, 2005, pp. 366–375.
-[10] M. K. Bhatti, C. Belleudy, and M. Auguin, "Hybrid power management in real time embedded systems: an interplay of DVFS and DPM techniques," *Real-Time Syst.*, vol. 47, no. 2, pp. 143–162, 2011.
-[11] STMicroelectronics, "STM32MP157 advanced Arm-based 32-bit MPUs," Reference Manual RM0436.
-[12] STMicroelectronics, "STM32MP13xx advanced Arm-based 32-bit MPUs," Reference Manual RM0475.
-[13] STMicroelectronics, "STM32MP135F-DK: Discovery kit with STM32MP135F MPU," Databrief DB4677, ver. 1.0, Feb. 2023; User Manual UM2993, ver. 2.0, Mar. 2023.
-[14] STMicroelectronics, "STPMIC1L: Power management IC for MPU: 2 buck converters and 4 LDOs," Datasheet DS14839, ver. 4.0, Apr. 2026.
-[15] STMicroelectronics, "AN6312: How to use STPMIC1L to develop a wall adapter powered application on STM32MP13 MPUs," Application Note, ver. 3.0, Apr. 2026.
-[16] STMicroelectronics, "AN6421: STPMIC1L NVM configuration," Application Note, ver. 1.0, Dec. 2025.
-[17] STMicroelectronics, "AN6429: STPMIC1L application hints," Application Note, ver. 1.0, Dec. 2025.
-[18] STMicroelectronics, "AN6438: The STPMIC1L BOM details," Application Note, ver. 1.0, Dec. 2025.
-[19] STMicroelectronics, "AN6384: The STPMIC1L PCB layout guidelines," Application Note, ver. 1.0, Oct. 2025.
-[20] A. P. Chandrakasan, S. Sheng, and R. W. Brodersen, "Low-power CMOS digital design," *IEEE J. Solid-State Circuits*, vol. 27, no. 4, pp. 473–484, Apr. 1992. DOI: 10.1109/4.126534
-[21] J. M. Rabaey, A. Chandrakasan, and B. Nikolic, *Digital Integrated Circuits: A Design Perspective*, 2nd ed. Upper Saddle River, NJ, USA: Prentice Hall, 2003.
+[1] F. Yao, A. Demers, and S. Shenker, "A scheduling model for reduced CPU energy," in *Proc. IEEE 36th Annu. Found. Comput. Sci.*, 1995, pp. 374–382. DOI: https://doi.org/10.1109/SFCS.1995.492493
+
+[2] P. Pillai and K. G. Shin, "Real-time dynamic voltage scaling for low-power embedded operating systems," in *Proc. 18th ACM Symp. Oper. Syst. Princ.*, 2001, pp. 89–102. DOI: https://doi.org/10.1145/502034.502044
+
+[3] T. Pering, T. Burd, and R. Brodersen, "The simulation and evaluation of dynamic voltage scaling algorithms," in *Proc. Int. Symp. Low Power Electron. Design*, 1998, pp. 76–81. DOI: https://doi.org/10.1145/280756.280790
+
+[4] T. D. Burd, T. A. Pering, A. J. Stratakos, and R. W. Brodersen, "A dynamic voltage scaled microprocessor system," *IEEE J. Solid-State Circuits*, vol. 35, no. 11, pp. 1571–1580, Nov. 2000. DOI: https://doi.org/10.1109/4.881202
+
+[5] L. Benini, A. Bogliolo, and G. De Micheli, "A survey of design techniques for system-level dynamic power management," *IEEE Trans. Very Large Scale Integr. (VLSI) Syst.*, vol. 8, no. 3, pp. 299–316, Jun. 2000. DOI: https://doi.org/10.1109/92.845896
+
+[6] T. Simunic, L. Benini, P. Glynn, and G. De Micheli, "Dynamic power management for portable systems," in *Proc. 6th Annu. Int. Conf. Mobile Comput. Netw.*, 2000, pp. 11–19. DOI: https://doi.org/10.1145/345910.345914
+
+[7] T. Simunic, L. Benini, A. Acquaviva, P. Glynn, and G. De Micheli, "Dynamic voltage scaling and power management for portable systems," in *Proc. 38th Design Autom. Conf.*, 2001. DOI: https://doi.org/10.1109/DAC.2001.935564
+
+[8] J. Pouwelse, K. Langendoen, and H. Sips, "Dynamic voltage scaling on a low-power microprocessor," in *Proc. 7th Annu. Int. Conf. Mobile Comput. Netw.*, 2001, pp. 251–259. DOI: https://doi.org/10.1145/381677.381701
+
+[9] X. Zhong and C.-Z. Xu, "Energy-aware modeling and scheduling of real-time tasks for dynamic voltage scaling," in *Proc. 26th IEEE Int. Real-Time Syst. Symp.*, 2005, pp. 366–375. DOI: https://doi.org/10.1109/RTSS.2005.17
+
+[10] M. K. Bhatti, C. Belleudy, and M. Auguin, "Hybrid power management in real time embedded systems: an interplay of DVFS and DPM techniques," *Real-Time Syst.*, vol. 47, no. 2, pp. 143–162, 2011. DOI: https://doi.org/10.1007/s11241-011-9116-y
+
+[11] STMicroelectronics, "STM32MP157 advanced Arm-based 32-bit MPUs," Reference Manual RM0436. [Online]. Available: https://www.st.com/en/microcontrollers-microprocessors/stm32mp157.html
+
+[12] STMicroelectronics, "STM32MP13xx advanced Arm-based 32-bit MPUs," Reference Manual RM0475. [Online]. Available: https://www.st.com/en/microcontrollers-microprocessors/stm32mp135.html
+
+[13] STMicroelectronics, "STM32MP135F-DK: Discovery kit with STM32MP135F MPU," Databrief DB4677, ver. 1.0, Feb. 2023; User Manual UM2993, ver. 2.0, Mar. 2023. [Online]. Available: https://www.st.com/en/evaluation-tools/stm32mp135f-dk.html
+
+[14] STMicroelectronics, "STPMIC1: Highly integrated power management IC for micro processor units," Datasheet DS12792, ver. 10.0, May 2022. [Online]. Available: https://www.st.com/en/power-management/stpmic1.html
+
+[15] STMicroelectronics, "AN5440: The STPMIC1 I2C programming guide," Application Note, ver. 1.0, Feb. 2020. [Online]. Available: https://www.st.com/en/power-management/stpmic1.html#documentation
+
+[16] STMicroelectronics, "AN5260: STM32MP151/153/157 MPU lines and STPMIC1 integration on a battery powered application," Application Note, ver. 2.0, Jan. 2021. [Online]. Available: https://www.st.com/en/power-management/stpmic1.html#documentation
+
+[17] STMicroelectronics, "AN5587: Integration of STM32MP13x MPU product lines and STPMIC1D/STPMIC1A on a wall adapter supply," Application Note, ver. 2.0, Jun. 2023. [Online]. Available: https://www.st.com/en/power-management/stpmic1.html#documentation
+
+[18] STMicroelectronics, "AN5861: STPMIC1 auto turn-on," Application Note, ver. 1.0, Nov. 2022. [Online]. Available: https://www.st.com/en/power-management/stpmic1.html#documentation
+
+[19] STMicroelectronics, "AN5431: The STPMIC1 PCB layout guidelines," Application Note, ver. 1.1, Dec. 2019. [Online]. Available: https://www.st.com/en/power-management/stpmic1.html#documentation
+
+[20] STMicroelectronics, "STPMIC1L: Power management IC for MPU: 2 buck converters and 4 LDOs," Datasheet DS14839, ver. 4.0, Apr. 2026. [Online]. Available: https://www.st.com/en/power-management/stpmic1l.html
+
+[21] STMicroelectronics, "AN6312: How to use STPMIC1L to develop a wall adapter powered application on STM32MP13 MPUs," Application Note, ver. 3.0, Apr. 2026. [Online]. Available: https://www.st.com/en/power-management/stpmic1l.html#documentation
+
+[22] STMicroelectronics, "AN6421: STPMIC1L NVM configuration," Application Note, ver. 1.0, Dec. 2025. [Online]. Available: https://www.st.com/en/power-management/stpmic1l.html#documentation
+
+[23] STMicroelectronics, "AN6429: STPMIC1L application hints," Application Note, ver. 1.0, Dec. 2025. [Online]. Available: https://www.st.com/en/power-management/stpmic1l.html#documentation
+
+[24] STMicroelectronics, "AN6438: The STPMIC1L BOM details," Application Note, ver. 1.0, Dec. 2025. [Online]. Available: https://www.st.com/en/power-management/stpmic1l.html#documentation
+
+[25] STMicroelectronics, "AN6384: The STPMIC1L PCB layout guidelines," Application Note, ver. 1.0, Oct. 2025. [Online]. Available: https://www.st.com/en/power-management/stpmic1l.html#documentation
+
+[26] A. P. Chandrakasan, S. Sheng, and R. W. Brodersen, "Low-power CMOS digital design," *IEEE J. Solid-State Circuits*, vol. 27, no. 4, pp. 473–484, Apr. 1992. DOI: https://doi.org/10.1109/4.126534
+
+[27] J. M. Rabaey, A. Chandrakasan, and B. Nikolic, *Digital Integrated Circuits: A Design Perspective*, 2nd ed. Upper Saddle River, NJ, USA: Prentice Hall, 2003.
