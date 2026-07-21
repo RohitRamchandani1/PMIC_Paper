@@ -8,3 +8,4 @@
 [Done] 7. Mention in the paper that the average of 5 readings were used to measure take the voltage values of the DDR, CORE and CPU in STPMIC1 also DDR and CORE for STPMIC1L. (Added in Section VI.B, Experimental Procedure)
 [Done] 8. I want to mention wherever appropriate that the value of the DDR in ideal condition is 1.3V and it only changes in the StandBy mode and our results are close to it(Only If they are let me know if they are not?). (Confirmed true from data; added in Section IV.B after Table I)
 [Done] 9. I want to mention wherever appropriate that the value of the CORE in ideal condition is 0.9V during the LPLV Stop mode and the average value calculated is very close to the value, which I calculated to be 903.64mV. (Added in Section VII.I, STPMIC1 LPLV-Stop Mode results)
+[ND] 10. 
