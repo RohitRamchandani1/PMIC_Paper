@@ -1,7 +1,7 @@
 # Software-Controlled Dynamic Voltage Scaling Using the STPMIC1/1L PMIC for STM32MP1-Based Embedded Systems
 
 ## Abstract
-Highly integrated modern embedded processors require multiple regulated voltage domains, deterministic power sequencing and software driven transitions between operating states. Although discrete regulator-based power architecture can fulfill basic requirements of supply, but it can only offer a limited amount of across rail coordination. Discrete regulator-based power supply can complicate runtime voltage control when the system complexity increases. In this paper an experimental evaluation of software driven power state management is presented using the STPMIC1/1L Power Management Integrated Circuits (PMIC) on the STM32MP135F-DK microprocessor. STM32Cube’s bare metal firmware environment along with the Board Support Package (BSP) PMIC API’s are used for the implementation and demonstration. BSP PMIC API’s are used to initialize the PMIC, configure voltage rails and enter the Run, Sleep, Stop, Low Power Stop(LP Stop), Low Power Low Voltage Stop(LPLV Stop), StandBy, and Switch Off States. Oscilloscope readings demonstrate that the Run Mode maintains the rails measured close to 1.31V and 1.20V, while LPLV Stop lowers the second measured rail to 842mV approximately while keeping the measured rail close to 1.31V. Standby and Switch Off measurement results demonstrate the rails collapse to the noise floor of the oscilloscope. The results demonstrate that the STPMIC1/1L BSP controlled PMIC path is able to perform stable software driven voltage scaling. It also shows the controlled rail shutdown on the STM32MP1 system.
+Highly integrated modern embedded processors require multiple regulated voltage domains, deterministic power sequencing and software driven transitions between operating states. Although discrete regulator-based power architecture can fulfill basic requirements of supply, it can only offer a limited amount of across rail coordination. Discrete regulator-based power supply can complicate runtime voltage control when the system complexity increases. In this paper an experimental evaluation of software driven power state management is presented using the STPMIC1 and STPMIC1L based Power Management Integrated Circuits (PMIC) on STM32MP135F-DK microprocessors. STM32Cube’s bare metal firmware environment along with the Board Support Package (BSP) PMIC API’s are used for the implementation and demonstration. BSP PMIC API’s are used to initialize the PMIC, configure voltage rails and enter the Run, Sleep, Stop, Low Power Stop (LP-Stop), Low Power Low Voltage Stop (LPLV-Stop), Standby, and Switch-Off power modes. For the STPMIC1L board, oscilloscope readings demonstrate that Run Mode maintains DDR and CORE voltage approximately 1.3 V and 1.2 V respectively, while LPLV-Stop lowers the CORE's voltage to 900 mV or 0.9V approximately while keeping DDR voltage at 1.3 V approximately. Standby and Switch-Off measurement results demonstrate both rails collapse to the oscilloscope noise floor. For the STPMIC1 board, mean-voltage measurements covering three rails — DDR, CORE, and CPU — are reported in Table VII, with ripple characterization and oscilloscope figures for that board still pending capture. The results demonstrate that the STPMIC1 and STPMIC1L BSP-controlled PMIC path is able to perform stable software-driven voltage scaling and controlled rail shutdown on STM32MP1-based systems.
 
 ## Keywords
 Dynamic Voltage Scaling, Power Management Integrated Circuit, STPMIC1, STPMIC1L, STM32MP1, Low Power Modes, Embedded Systems, I2C, BSP
@@ -12,19 +12,19 @@ Embedded systems increasingly rely on heterogeneous processors, high speed inter
 These problems are addressed by integrating Low Dropout regulators (LDOs), DC-DC converters, load switches, sequencing logic, and digital control interfaces into a single coordinated power device in multi-output PMICs. STPMIC1 and STPMIC1L provide PMIC architecture for STM32MP1 class microprocessor units (MPUs), which are configured through I2C and managed through the firmware on board level. This functionality enables the software to participate directly in power state transitions rather than treating voltage regulation as a fixed hardware function.
 
 This paper demonstrates that PMICs can provide regulated supplies through the software controlled PMIC path, during the practical low power transitions on STM32MP1 which is an STM32 MPU’s evaluation platform. This paper also provides evidence that BSP-level API’s can configure rails, apply Dynamic Voltage Scaling (DVS), and transition between Run, Low-Power, and Shutdown states while maintaining observable rail stability.
-This paper demonstrates this using a structured implementation and measurement study of the STPMIC1/1L driver path on the STM32MP135F-DK discovery kit. The contributions of this study are that it documents a bare-metal STM32Cube PMIC control flow using BSP initialization, rail configuration, and power-mode transition APIs. It experimentally characterizes the measured rail behavior in Run, LPLV-Stop, Standby, and Switch-Off modes using oscilloscope captures. It separates software implementation behavior from measurement results and discussion, providing a clearer basis for evaluating PMIC-assisted low-power design on STM32MP1-based systems.
+This paper demonstrates this using a structured implementation and measurement study of the STPMIC1 and STPMIC1L driver path on the STM32MP135F-DK discovery kit. The contributions of this study are that it documents a bare-metal STM32Cube PMIC control flow using BSP initialization, rail configuration, and power-mode transition APIs. It experimentally characterizes the measured rail behavior in Run, LPLV-Stop, Standby, and Switch-Off modes using oscilloscope captures. It separates software implementation behavior from measurement results and discussion, providing a clearer basis for evaluating PMIC-assisted low-power design on STM32MP1-based systems.
 
 
 ## II. Related Work and Technical Context
 Embedded systems power management approaches have shifted from discrete regulator setups to integrated PMIC based architectures. Multi-rail embedded platforms have been studied before and it has been established that the systems using separate buck converters and LDOs face challenges in board density, thermal distribution, sequencing coordination, and runtime flexibility [1]–[4]. PMIC oriented analysis and application materials demonstrate how integrated regulators, protection logic, and sequencing engines can simplify the power delivery complexity and enhance coordination across rails [5]–[8].
 
-The STPMIC1 family targets STM32MP1 class systems and comprises several DC-DC converters, LDOs, load switches, programmable sequencing, and an I2C control interface [9]–[11]. These capabilities make it ideal for software managed operating states where firmware changes rail configuration based on platform activity.
+STPMIC1 and STPMIC1L family targets STM32MP1 class systems and comprises several DC-DC converters, LDOs, load switches, programmable sequencing, and an I2C control interface [9]–[11]. These capabilities make it ideal for software managed operating states where firmware changes rail configuration based on platform activity.
 
 Power management through software is also an important technique in embedded low power design. When workload or retention requirements permit lower voltage or rail shutdown, energy consumption can be reduced through Dynamic voltage and frequency scaling (DVFS) and software controlled low power states [12]–[15]. This paper extends this context to the board level PMIC driver path and measured rail behavior during selected low-power transitions on an STM32MP135F-DK platform.
 
 ## III. Literature Review
 
-Software-controlled low-power design for embedded systems is supported by prior work on variable-speed scheduling, DVS, DVFS, and DPM [1]–[10]. CMOS dynamic power is approximately proportional to CV_DD^2 f, so voltage reduction is commonly treated as a mechanism for reducing dynamic energy when performance constraints permit it [26], [27].
+Software-controlled low-power design for embedded systems is supported by prior work on variable-speed scheduling, DVS, DVFS, and DPM [1]–[10]. CMOS dynamic power is approximately proportional to `CV_DD^2 f`, so voltage reduction is commonly treated as a mechanism for reducing dynamic energy when performance constraints permit it [26], [27].
 
 Yao, Demers, and Shenker formalized a scheduling model in which variable processor speed can reduce CPU energy when timing constraints are considered [1]. Pillai and Shin showed that operating-system software can manage dynamic voltage scaling for embedded real-time workloads [2]. Pering, Burd, and Brodersen evaluated DVS algorithms and showed that workload conditions and policy choices affect energy outcomes [3]. Burd, Pering, Stratakos, and Brodersen demonstrated a dynamic-voltage-scaled microprocessor system, supporting the claim that DVS can be implemented in real processor hardware [4].
 
@@ -41,19 +41,25 @@ Taken together, the reviewed sources support a careful framing of the STM32MP1/S
 
 The hardware, described in the STM32MP1/STPMIC1-class hardware documentation, board documents, datasheets, and application notes provides PMIC, rail-control, sequencing, low-power-mode, and integration mechanisms that can be employed for software regulated experiments [11]–[25]. However, the same set of source does not support the claim that voltage measurements alone are sufficient to demonstrate system-level energy savings, because the listed sources associate energy outcomes with workload behavior, timing constraints, idle intervals, state-transition costs, and broader DVFS/DPM interactions [3], [6], [7], [9], [10].
 
+Consistent with this framing, the present study reports rail-level DVS measurements for both the STPMIC1L board (VDD_DDR and VDD_CORE, Sections VI–VII) and the STPMIC1 board (VDD_DDR, VDD_CORE, and VDD_CPU, Section VII.G–L), and restricts its conclusions to observed rail-voltage behavior rather than system-level energy savings, in line with the DVFS/DPM literature reviewed above [3], [6], [7], [9], [10].
+
 ## IV. System Platform and PMIC Architecture
 
 ### A. Hardware Platform
-STM32MP135F-DK discovery kit is used as an experimental platform, the main processing of which is a Cortex A7 STM32MP1 MPU. The board is powered by a STPMIC1 or STPMIC1L PMIC connected via an I2C Instance. The PMIC provides the main MPU voltage domains with BUCK regulators, LDOs, and load switches. Outputs associated with system domains are included in the measured rails like processing core, DDR interface, GPIO banks, communication peripherals, and internal analog circuitry.
+STM32MP135F-DK discovery kit is used as an experimental platform, the main processing of which is a Cortex A7 STM32MP1 MPU. The board is powered by a STPMIC1 or STPMIC1L PMIC connected via an I2C Instance. The PMIC provides the main MPU voltage domains with BUCK regulators, LDOs, and load switches. Outputs associated with system domains are included in the measured rails like processing core, DDR interface, GPIO banks, communication peripherals, and internal analog circuitry. The STPMIC1L variant was evaluated on the STM32MP135F-A02 board revision, while the STPMIC1 variant was evaluated on the STM32MP135F-E02 board revision.
 
 The PMIC integrates voltage generation and sequencing, enabling startup, voltage scaling, low-power entry, and rail shutdown to be coordinated via PMIC configuration and firmware level control. The external rail behavior was measured using a Tektronix Mixed Domain Oscilloscope.
 
-<img src="01.Hardware_Setup.png" width=600px alt="STPMIC1L connected to STM32MP135F-DK board">
+<img src="01.Hardware_Setup_STPMIC1.png" width=600px alt="STPMIC1 connected to STM32MP135F-DK board">
 
-**Figure. 1.** STPMIC1L connected to the STM32MP135F-DK board.
+**Figure. 1(a).** STPMIC1 connected to the STM32MP135F-DK board.
+
+<img src="01.Hardware_Setup_STPMIC1L.png" width=600px alt="STPMIC1L connected to STM32MP135F-DK board">
+
+**Figure. 1(b).** STPMIC1L connected to the STM32MP135F-DK board.
 
 ### B. PMIC-Controlled Voltage Domains
-PMIC supplies multiple control outputs by combining BUCK1, BUCK2 along with several LDO rails. Probes of the oscilloscope were connected to VDDCORE and DDR PMIC output rails in order to observe steady state voltages, voltage reduction during low-power operation, and rail collapse during shutdown-oriented states.
+PMIC supplies multiple control outputs by combining BUCK1, BUCK2 along with several LDO rails. Probes of the oscilloscope were connected to CORE and DDR PMIC output rails in order to observe steady state voltages, voltage reduction during low-power operation, and rail collapse during shutdown-oriented states.
 
 **Table I — Rail-to-Load Mapping and Low-Power States for MB2192-A01 / STM32MP135F with STPMIC1L**
 
@@ -73,7 +79,7 @@ PMIC supplies multiple control outputs by combining BUCK1, BUCK2 along with seve
 	</thead>
 	<tbody>
 		<tr>
-			<td style="border: 1px solid #000; padding: 4px;">VDDCORE</td>
+			<td style="border: 1px solid #000; padding: 4px;">VDD_CORE</td>
 			<td style="border: 1px solid #000; padding: 4px;">BUCK1</td>
 			<td style="border: 1px solid #000; padding: 4px;">1.22 V</td>
 			<td style="border: 1px solid #000; padding: 4px;">1.25 V, ON</td>
@@ -130,7 +136,7 @@ PMIC supplies multiple control outputs by combining BUCK1, BUCK2 along with seve
 	</tbody>
 </table>
 
-Table I shows that VDDCORE/BUCK1 is the only listed rail reduced in LPLV-Stop, changing from a 1.25 V Run/Stop target to a 0.9 V LPLV-Stop target. VDD_DDR/BUCK2 remains at 1.35 V in Run/Stop, LP-Stop, LPLV-Stop, and Standby with DDR self-refresh, and is disabled only in the Standby DDR-off profile.
+Table I shows that VDD_CORE/BUCK1 is the only listed rail reduced in LPLV-Stop, changing from a 1.25 V Run/Stop target to a 0.9 V LPLV-Stop target. VDD_DDR/BUCK2 remains at 1.35 V in Run/Stop, LP-Stop, LPLV-Stop, and Standby with DDR self-refresh, and is disabled only in the Standby DDR-off profile. The VDD_DDR rail's nominal target of approximately 1.3 V therefore remains unchanged across Run, Sleep, Stop, LP-Stop, and LPLV-Stop, and is only removed once the platform enters a Standby (DDR-off) or Switch-Off state; the measured DDR means of ≈1.31 V (STPMIC1L, Table III) and 1.34 V (STPMIC1, Table VII) are consistent with this near-1.3 V nominal target.
 
 The Standby waveform in this study, where both measured channels collapse toward the oscilloscope noise floor, corresponds to the Standby DDR-off profile rather than the Standby DDR self-refresh profile. Switch-Off is not separately listed in the low-power-state configuration; it is treated here as a deeper shutdown-oriented state based on the measured rail collapse.
 
@@ -148,7 +154,7 @@ The BSP hierarchy provides the firmware entry points used for PMIC control:
 
 The platform powers up in Run Mode by default. Before entering deeper low-power states, wake-up sources must be configured so that the system can return to Run Mode after the low-power interval. The PMIC power-management flow is summarized in Figure. 2.
 
-<img src="01.Software_Setup.png" height=600px alt="STPMIC1/1L BSP power-management flow">
+<img src="01.Software_Setup.png" width=600px alt="STPMIC1/1L BSP power-management flow">
 
 **Figure. 2.** BSP-controlled STPMIC1/1L power-management flow: initialization, low-power entry, wake-up handling, and return to Run Mode.
 
@@ -171,7 +177,7 @@ sequenceDiagram
 	FW->>MPU: Configure wake-up source
 	FW->>I2C: Write low-power rail setpoints
 	I2C->>PMIC: Update PMIC registers
-	PMIC->>Rails: Scale VDDCORE / hold retained rails
+	PMIC->>Rails: Scale VDD_CORE / hold retained rails
 	FW->>MPU: Enter LP-Stop or LPLV-Stop
 	MPU-->>FW: Wake-up event
 	FW->>I2C: Restore Run Mode rail setpoints
@@ -187,14 +193,15 @@ sequenceDiagram
 ### A. Instrumentation
 Voltage rail behavior was captured using a Tektronix Mixed Domain Oscilloscope. The probes were connected to selected PMIC output rails to measure steady-state voltage, ripple characteristics, transition behavior, and rail collapse during low-power and shutdown-oriented states.
 
-![Experimental oscilloscope setup, view 1](./02.Experimental_procedure_01.png)
-
-![Experimental oscilloscope setup, view 2](./03.Experimental_procedure_02.png)
+<div>
+<img src="02.Experimental_procedure_01.png" width=600px alt="Experimental oscilloscope setup, view 1">
+<img src="03.Experimental_procedure_02.png" width=600px alt="Experimental oscilloscope setup, view 2">
+</div>
 
 **Figure. 4.** Oscilloscope-based measurement setup for PMIC rail observation during software-controlled power-mode transitions.
 
 ### B. Experimental Procedure
-The evaluation began with Run Mode as the baseline operating condition. Low-power modes were then invoked sequentially through the BSP PMIC control path. During each mode, oscilloscope captures were recorded for the selected rails. The analysis compares mean rail voltages, visible ripple behavior, and qualitative rail stability across Run, LPLV-Stop, Standby, and Switch-Off modes.
+The evaluation began with Run Mode as the baseline operating condition. Low-power modes were then invoked sequentially through the BSP PMIC control path. During each mode, oscilloscope captures were recorded for the selected rails. The analysis compares mean rail voltages, visible ripple behavior, and qualitative rail stability across Run, LPLV-Stop, Standby, and Switch-Off modes. For the STPMIC1L board, the reported mean voltages for the DDR and CORE rails are computed as the average of five oscilloscope captures per mode; for the STPMIC1 board, the reported mean voltages for the DDR, CORE, and CPU rails are likewise computed as the average of five captures per mode.
 
 The available measurements support a voltage-focused comparison. Current consumption, energy per transition, and full transition timing were not reported in the source measurements and are therefore not quantified in this paper.
 
@@ -203,7 +210,7 @@ The available measurements support a voltage-focused comparison. Current consump
 | Parameter 							| Run Mode          | LPLV Stop  		| StandBy 	 		| StandBy-SR 		| LPStop  	 		| Sleep   	 		| Stop       		| Switch-Off 		|
 | :--- 									| :--- 	            | :---       		| :---    	 		| :---       		| :---    	 		| :---    	 		| :---       		| :---       		|
 | **Ch 1 Hardware Rail** 				| VDD_DDR           | VDD_DDR    		| VDD_DDR 	 		| VDD_DDR 			| VDD_DDR 	 		| VDD_DDR 	 		| VDD_DDR    		| VDD_DDR    		|
-| **Ch 2 Hardware Rail** 				| VDDCORE           | VDDCORE    		| VDDCORE 	 		| VDDCORE 			| VDDCORE 	 		| VDDCORE 	 		| VDDCORE    		| VDDCORE    		|
+| **Ch 2 Hardware Rail** 				| VDD_CORE           | VDD_CORE    		| VDD_CORE 	 		| VDD_CORE 			| VDD_CORE 	 		| VDD_CORE 	 		| VDD_CORE    		| VDD_CORE    		|
 | **Probe Model (Ch1/Ch2)** 			| TPP0100           | TPP0100    		| TPP0100 	 		| TPP0100 			| TPP0100 	 		| TPP0100 	 		| TPP0100    		| TPP0100    		|
 | **Attenuation Ratio** 				| 10:1              | 10:1       		| 10:1 		 		| 10:1 				| 10:1    	 		| 10:1    	 		| 10:1       		| 10:1       		|
 | **Input Coupling** 					| DC                | DC         		| DC 		 		| DC 				| DC      	 		| DC      	 		| DC         		| DC         		|
@@ -212,8 +219,8 @@ The available measurements support a voltage-focused comparison. Current consump
 | **Time per Division** 				| 1.00 s/div        | 1.00 s/div 		| 1.00 s/div 		| 1.00 s/div        | 1.00 s/div 		| 1.00 s/div 		| 1.00 s/div 		| 1.00 s/div 		|
 | **Sampling Rate** 					| 1.00 kS/s         | 1.00 kS/s  		| 1.00 kS/s  		| 1.00 kS/s         | 1.00 kS/s  		| 1.00 kS/s  		| 1.00 kS/s  		| 1.00 kS/s         |
 | **Run Mode / Acquisition**			| High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) | High Res (1 Acqs) |
-| **Ch 1 Mean Volt (VDD_DDR)** 			| 1.311 V           | 1.31 V            | ≈ −0.03 V         | 1.31 V            | 1.31 V            | 1.31 V            | 1.31 V          | ≈ 0 V             |
-| **Ch 2 Mean Volt (VDDCORE)** 			| 1.224 V           | 0.842 V           | ≈ −0.03 V         | ≈ −0.03 V         | 1.20 V            | 1.20 V            | 1.20 V          | ≈ 0 V             |
+| **Ch 1 Mean Volt (VDD_DDR)** 			| 1.311 V           | 1.31 V            | ≈ −0.03 V         | 1.31 V            | 1.31 V            | 1.31 V            | 1.31 V            | ≈ 0 V             |
+| **Ch 2 Mean Volt (VDD_CORE)** 		| 1.224 V           | 0.842 V           | ≈ −0.03 V         | ≈ −0.03 V         | 1.20 V            | 1.20 V            | 1.20 V            | ≈ 0 V             |
 | **Trigger Source** 					| Channel 1         | Channel 1         | Channel 1      	| Channel 1         | Channel 1         | Channel 1         | Channel 1      	| Channel 1         |
 | **Trigger Level** 					| 0.00 V (Rising)   | 0.00 V (Rising)   | 0.00 V (Rising) 	| 0.00 V (Rising)   | 0.00 V (Rising)   | 0.00 V (Rising)   | 0.00 V (Rising) 	| 0.00 V (Rising) 	|
 
@@ -223,62 +230,62 @@ Table II lists the probe model, attenuation, coupling, bandwidth limit, vertical
 
 ### A. Run/Sleep/Stop/LP-Stop Mode
 
-Figure. 5 illustrates the simultaneous measurement of the two voltage rails on the STM32MP135F-DK board during Run Mode. The oscilloscope reports a mean voltage of roughly 1.31 V on Channel 1 (VDD_DDR) and approximately 1.20 V on Channel 2 (VDDCORE), with both channels remaining stable as flat DC signals near their respective mean values throughout the captured interval. The measured peak-to-peak ripple, averaged over five captures, is approximately 22.98 mV on Channel 1 (VDD_DDR) and 24.89 mV on Channel 2 (VDDCORE). To capture these waveforms, both vertical channels are configured to a scale of 1.00 V/div with a 250 MHz bandwidth limit, while the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s to monitor long term rail stability.
+Figure. 5 illustrates the simultaneous measurement of the two voltage rails on the STM32MP135F-DK board during Run Mode. The oscilloscope reports a mean voltage of roughly 1.31 V on Channel 1 (VDD_DDR) and approximately 1.20 V on Channel 2 (VDD_CORE), with both channels remaining stable as flat DC signals near their respective mean values throughout the captured interval. The measured peak-to-peak ripple, averaged over five captures, is approximately 22.98 mV on Channel 1 (VDD_DDR) and 24.89 mV on Channel 2 (VDD_CORE). To capture these waveforms, both vertical channels are configured to a scale of 1.00 V/div with a 250 MHz bandwidth limit, while the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s to monitor long term rail stability.
 
-![Run Mode rail waveform](./04.Run_Mode.png)
+<img src="04.Run_Mode.png" width=600px alt="Run Mode rail waveform">
 
 **Figure. 5.** Run Mode rail voltages on the STM32MP135F-DK board. Channel 1(VDD DDR): 1.31 V mean. Channel 2(VDD Core): 1.20 V mean.
 
 ### B. LPLV-Stop Mode
 
-Figure. 6. illustrates the behavior of the voltage rails after the BSP transitions the STM32MP135F-DK board to LPLV-Stop Mode. Observed oscilloscope readings show that the mean voltage on Channel 1 (VDD_DDR) is approximately 1.31 V and the reduced mean voltage on Channel 2 (VDDCORE) is approximately 842 mV. It can be observed that both the channels trace clean and flat DC lines with no oscillation or visible instability across the captured interval. Both the vertical channels are configured to a scale of 1.00 V/div with a bandwidth limit of 250MHz to accurately capture this low power state, while ensuring a stable measurement sweep the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s.
+Figure. 6. illustrates the behavior of the voltage rails after the BSP transitions the STM32MP135F-DK board to LPLV-Stop Mode. Observed oscilloscope readings show that the mean voltage on Channel 1 (VDD_DDR) is approximately 1.31 V and the reduced mean voltage on Channel 2 (VDD_CORE) is approximately 842 mV. It can be observed that both the channels trace clean and flat DC lines with no oscillation or visible instability across the captured interval. Both the vertical channels are configured to a scale of 1.00 V/div with a bandwidth limit of 250MHz to accurately capture this low power state, while ensuring a stable measurement sweep the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s.
 
-Channel 2 corresponds to the VDDCORE rail (BUCK1), whose BSP-programmed LPLV-Stop target is 0.9 V (Table I). The measured 842 mV therefore represents a −58 mV (−6.4%) deviation from the commanded target, consistent with correct DVS operation. The Run-to-LPLV-Stop transition waveform is shown in Figure. 6; the transition duration and settling time are not cursor-quantified in this study.
+Channel 2 corresponds to the VDD_CORE rail (BUCK1), whose BSP-programmed LPLV-Stop target is 0.9 V (Table I). The measured 842 mV therefore represents a −58 mV (−6.4%) deviation from the commanded target, consistent with correct DVS operation. The Run-to-LPLV-Stop transition waveform is shown in Figure. 6; the transition duration and settling time are not cursor-quantified in this study.
 
-![LPLV-Stop Mode rail waveform transition](05.LPLV_Stop_Mode_Transition.png)
+<img src="05.LPLV_Stop_Mode_Transition.png" width=600px alt="LPLV-Stop Mode rail waveform transition">
 
-**Figure. 6.** Transition from Run Mode to LPLV-Stop Mode of VDDCORE and DDR power rail voltages.
+**Figure. 6.** Transition from Run Mode to LPLV-Stop Mode of VDD_CORE and DDR power rail voltages.
 
 
-![LPLV-Stop Mode rail waveform](./06.LPLV_Stop_Mode.png)
+<img src="06.LPLV_Stop_Mode.png" width=600px alt="LPLV-Stop Mode rail waveform">
 
-**Figure. 7.** Oscilloscope readings of VDDCORE  and DDR power rail voltages under LPLV-Stop Mode.
+**Figure. 7.** Oscilloscope readings of VDD_CORE  and DDR power rail voltages under LPLV-Stop Mode.
 
 ### C. Standby Mode
 
 Figure. 9 shows both channels at near-zero levels in Standby Mode. The values measured fall in the range of −25 mV to −35 mV on both channels. These values lie within the oscilloscope measurement baseline and indicate that the probed rails are deactivated in this state. Retention or backup supply rails present on the board are outside the two measured channels and are not characterized here.
 
-![Standby Mode rail waveform transition](07.Stand_By_Mode_Transition.png)
+<img src="07.Stand_By_Mode_Transition.png" width=600px alt="Standby Mode rail waveform transition">
 
-**Figure. 8.**  Transition from Run Mode to Standby Mode of VDDCORE and DDR power rail voltages.
+**Figure. 8.**  Transition from Run Mode to Standby Mode of VDD_CORE and DDR power rail voltages.
 
-![Standby Mode rail waveform](./08.Stand_By_Mode.png)
+<img src="08.Stand_By_Mode.png" width=600px alt="Standby Mode rail waveform">
 
 **Figure. 9.** Standby Mode rail voltages. Both channels: −25 mV to −35 mV, within the oscilloscope noise floor.
 
 ### D. Standby SR Mode
 
-![Standby Mode SR rail waveform transition](07.Stand_By_SR_Mode_Transition.png)
+<img src="07.Stand_By_SR_Mode_Transition.png" width=600px alt="Standby Mode SR rail waveform transition">
 
-**Figure. 10.** Transition from Run Mode to Standby (DDR self-refresh) Mode; VDD_DDR is retained while VDDCORE collapses to the oscilloscope noise floor.
+**Figure. 10.** Transition from Run Mode to Standby (DDR self-refresh) Mode; VDD_DDR is retained while VDD_CORE collapses to the oscilloscope noise floor.
 
-![Standby Mode SR rail waveform](08.Stand_By_SR_Mode.png)
+<img src="08.Stand_By_SR_Mode.png" width=600px alt="Standby Mode SR rail waveform">
 
-**Figure. 11.** Standby (DDR self-refresh) Mode rail voltages; VDD_DDR retained near 1.31 V, VDDCORE at the oscilloscope noise floor.
+**Figure. 11.** Standby (DDR self-refresh) Mode rail voltages; VDD_DDR retained near 1.31 V, VDD_CORE at the oscilloscope noise floor.
 
 ### E. Switch-Off Mode
 
 Figure. 13 shows near-zero measured voltage on both channels in Switch-Off Mode. No distinguishable ripple or switching activity is present on the measured outputs.
 
-![Switch-Off Mode rail waveform transition](./09.Switch_OFF_Mode_Transition.png)
+<img src="09.Switch_OFF_Mode_Transition.png" width=600px alt="Switch-Off Mode rail waveform transition">
 
 **Figure. 12.** Transition to Switch-Off Mode. Both channels near zero; no ripple detected on measured outputs.
 
-![Switch-Off Mode rail waveform](./10.Switch_OFF_Mode.png)
+<img src="10.Switch_OFF_Mode.png" width=600px alt="Switch-Off Mode rail waveform">
 
 **Figure. 13.** Switch-Off Mode rail voltages. Both channels near zero; no ripple detected on measured outputs.
 
-### F. Summary of Observed Rail Voltages
+### F. Summary of Observed Rail Voltages — STPMIC1L
 
 Table III reports the mean rail voltages recorded from the oscilloscope captures. Only values present in the source measurements are included. Ripple amplitude, voltage transition duration, wake latency, and current consumption were not measured in this study and are omitted.
 
@@ -294,46 +301,176 @@ Table III reports the mean rail voltages recorded from the oscilloscope captures
 
 **Table IV — Commanded Versus Measured Voltage for Probed Rails (Table I Mapping)**
 
-| Mode                      | Channel 1 rail  | Ch1 target (VDD DDR) | Ch1 measured (VDD DDR) | Ch1 dev. (mV) | Ch1 dev. (%) | Channel 2 rail  | Ch2 target (V) | Ch2 measured (V) | Ch2 dev. (mV) | Ch2 dev. (%) |
-| ------------------------- | --------------- | -------------------: | ---------------------: | ------------: | -----------: | --------------- | -------------: | ---------------: | ------------: | -----------: |
-| Run/Sleep/Stop/LP-Stop    | BUCK2 / VDD_DDR |                 1.35 |                   1.31 |           −40 |         −3.0 | BUCK1 / VDDCORE |           1.25 |             1.20 |           −50 |         −4.0 |
-| LPLV-Stop                 | BUCK2 / VDD_DDR |                 1.35 |                   1.31 |           −40 |         −3.0 | BUCK1 / VDDCORE |           0.90 |            0.842 |           −58 |         −6.4 |
-| Standby, DDR self-refresh | BUCK2 / VDD_DDR |                 1.35 |                   1.31 |           −40 |         −3.0 | BUCK1 / VDDCORE |            OFF |              N/A |           N/A |          N/A |
-| Standby, DDR off          | BUCK2 / VDD_DDR |                  OFF |       −0.025 to −0.035 |           N/A |          N/A | BUCK1 / VDDCORE |            OFF | −0.025 to −0.035 |           N/A |          N/A |
-| Switch-Off                | BUCK2 / VDD_DDR |                  OFF |       −0.025 to −0.035 |           N/A |          N/A | BUCK1 / VDDCORE |            OFF | −0.025 to −0.035 |           N/A |          N/A |
+| Mode                      | Channel 1 rail  | Ch1 target (VDD DDR) | Ch1 measured (VDD DDR) | Ch1 dev. (mV) | Ch1 dev. (%) | Channel 2 rail   | Ch2 target (V) | Ch2 measured (V) | Ch2 dev. (mV) | Ch2 dev. (%) |
+| ------------------------- | --------------- | -------------------: | ---------------------: | ------------: | -----------: | ---------------- | -------------: | ---------------: | ------------: | -----------: |
+| Run/Sleep/Stop/LP-Stop    | BUCK2 / VDD_DDR |                 1.35 |                   1.31 |           −40 |         −3.0 | BUCK1 / VDD_CORE |           1.25 |             1.20 |           −50 |         −4.0 |
+| LPLV-Stop                 | BUCK2 / VDD_DDR |                 1.35 |                   1.31 |           −40 |         −3.0 | BUCK1 / VDD_CORE |           0.90 |            0.842 |           −58 |         −6.4 |
+| Standby, DDR self-refresh | BUCK2 / VDD_DDR |                 1.35 |                   1.31 |           −40 |         −3.0 | BUCK1 / VDD_CORE |            OFF |              N/A |           N/A |          N/A |
+| Standby, DDR off          | BUCK2 / VDD_DDR |                  OFF |       −0.025 to −0.035 |           N/A |          N/A | BUCK1 / VDD_CORE |            OFF | −0.025 to −0.035 |           N/A |          N/A |
+| Switch-Off                | BUCK2 / VDD_DDR |                  OFF |       −0.025 to −0.035 |           N/A |          N/A | BUCK1 / VDD_CORE |            OFF | −0.025 to −0.035 |           N/A |          N/A |
 
-Table IV compares the BSP-programmed target voltage of each probed rail against the oscilloscope-measured mean and reports the deviation in millivolts and percent. The largest deviation is −6.4% on the VDDCORE/BUCK1 LPLV-Stop rail (0.842 V measured versus 0.9 V commanded), which remains within a range consistent with correct DVS operation.
+Table IV compares the BSP-programmed target voltage of each probed rail against the oscilloscope-measured mean and reports the deviation in millivolts and percent. The largest deviation is −6.4% on the VDD_CORE/BUCK1 LPLV-Stop rail (0.842 V measured versus 0.9 V commanded), which remains within a range consistent with correct DVS operation.
 
 **Table V — Peak-to-Peak Ripple per Capture and Average (mV)**
 
-| Mode       | Rail (Channel) | Capture 1 | Capture 2 | Capture 3 | Capture 4 | Capture 5 | Average (mV) |
-| ---------- | -------------- | --------: | --------: | --------: | --------: | --------: | -----------: |
-| Run        | VDD_DDR (Ch 1) |     22.50 |     25.10 |     22.90 |     21.20 |     23.20 |        22.98 |
-| Run        | VDDCORE (Ch 2) |     23.75 |     24.30 |     26.40 |     25.10 |     24.90 |        24.89 |
-| LPLV-Stop  | VDD_DDR (Ch 1) |     26.20 |     19.60 |     23.40 |     22.90 |     26.50 |        23.72 |
-| LPLV-Stop  | VDDCORE (Ch 2) |     25.40 |     20.40 |     22.90 |     24.00 |     27.10 |        23.96 |
-| Standby    | VDD_DDR (Ch 1) |     25.60 |     26.80 |     24.00 |     26.40 |     26.00 |        25.76 |
-| Standby    | VDDCORE (Ch 2) |     23.50 |     26.80 |     22.90 |     24.80 |     25.40 |        24.68 |
-| Standby-SR | VDD_DDR (Ch 1) |     25.00 |     25.40 |     24.50 |     24.30 |     24.80 |        24.80 |
-| Standby-SR | VDDCORE (Ch 2) |     24.80 |     25.60 |     24.30 |     22.90 |     24.00 |        24.32 |
+| Mode       | Rail (Channel)  | Capture 1 | Capture 2 | Capture 3 | Capture 4 | Capture 5 | Average (mV) |
+| ---------- | --------------- | --------: | --------: | --------: | --------: | --------: | -----------: |
+| Run        | VDD_DDR (Ch 1)  |     22.50 |     25.10 |     22.90 |     21.20 |     23.20 |        22.98 |
+| Run        | VDD_CORE (Ch 2) |     23.75 |     24.30 |     26.40 |     25.10 |     24.90 |        24.89 |
+| LPLV-Stop  | VDD_DDR (Ch 1)  |     26.20 |     19.60 |     23.40 |     22.90 |     26.50 |        23.72 |
+| LPLV-Stop  | VDD_CORE (Ch 2) |     25.40 |     20.40 |     22.90 |     24.00 |     27.10 |        23.96 |
+| Standby    | VDD_DDR (Ch 1)  |     25.60 |     26.80 |     24.00 |     26.40 |     26.00 |        25.76 |
+| Standby    | VDD_CORE (Ch 2) |     23.50 |     26.80 |     22.90 |     24.80 |     25.40 |        24.68 |
+| Standby-SR | VDD_DDR (Ch 1)  |     25.00 |     25.40 |     24.50 |     24.30 |     24.80 |        24.80 |
+| Standby-SR | VDD_CORE (Ch 2) |     24.80 |     25.60 |     24.30 |     22.90 |     24.00 |        24.32 |
 
 Table V reports the peak-to-peak ripple of each measured rail across five captures per mode, together with the per-mode average. The ripple stays within a narrow band of roughly 20–27 mV across all active modes, indicating that rail switching noise remains comparable regardless of the selected power state.
 
 **Table VI — Mode-Feature Matrix**
-| Mode 	     | Rail (Channel) | PMIC outputs enabled or disabled | Wake Up Source |
-|   ---	     |        ---     |                ---				 |       ---   	  |
-| Run 	     | VDD_DDR (Ch 1) |              Enabled             | Not Applicable |
-| Run        | VDDCORE (Ch 2) |              Enabled             | Not Applicable |
-| LPLV-Stop  | VDD_DDR (Ch 1) |              Enabled             |      RTC		  |
-| LPLV-Stop  | VDDCORE (Ch 2) |              Enabled             |      RTC		  |
-| Standby    | VDD_DDR (Ch 1) |              Disabled            |      RTC		  |
-| Standby    | VDDCORE (Ch 2) |              Disabled            |      RTC		  |
-| Standby-SR | VDD_DDR (Ch 1) |              Enabled             |      RTC		  |
-| Standby-SR | VDDCORE (Ch 2) |              Disabled            |      RTC		  |
-| Switch-Off | VDD_DDR (Ch 1) |              Disabled            | Wake Up Button |
-| Switch-Off | VDDCORE (Ch 2) |              Disabled            | Wake Up Button |
+| Mode 	     | Rail (Channel)  | PMIC outputs enabled or disabled | Wake Up Source    |
+|   ---	     |        ---      |                ---				  |       ---   	  |
+| Run 	     | VDD_DDR (Ch 1)  |              Enabled             | Not Applicable    |
+| Run        | VDD_CORE (Ch 2) |              Enabled             | Not Applicable    |
+| LPLV-Stop  | VDD_DDR (Ch 1)  |              Enabled             |      RTC		  |
+| LPLV-Stop  | VDD_CORE (Ch 2) |              Enabled             |      RTC		  |
+| Standby    | VDD_DDR (Ch 1)  |              Disabled            |      RTC		  |
+| Standby    | VDD_CORE (Ch 2) |              Disabled            |      RTC		  |
+| Standby-SR | VDD_DDR (Ch 1)  |              Enabled             |      RTC		  |
+| Standby-SR | VDD_CORE (Ch 2) |              Disabled            |      RTC		  |
+| Switch-Off | VDD_DDR (Ch 1)  |              Disabled            | Wake Up Button    |
+| Switch-Off | VDD_CORE (Ch 2) |              Disabled            | Wake Up Button    |
 
-Table VI presents a mode-feature matrix for the evaluated operating modes, listing for each probed rail whether its PMIC output is enabled or disabled and the wake-up source required to return the platform to Run Mode. Both probed rails (VDD_DDR/BUCK2 and VDDCORE/BUCK1) are enabled in Run and LPLV-Stop; in Standby with DDR self-refresh only VDD_DDR is retained while VDDCORE is disabled; and both rails are disabled in Standby (DDR off) and Switch-Off. The real-time clock (RTC) provides the wake-up source for the low-power stop and standby states, Switch-Off is exited through the hardware wake-up button, and Run Mode requires no wake-up source.
+Table VI presents a mode-feature matrix for the evaluated operating modes, listing for each probed rail whether its PMIC output is enabled or disabled and the wake-up source required to return the platform to Run Mode. Both probed rails (VDD_DDR/BUCK2 and VDD_CORE/BUCK1) are enabled in Run and LPLV-Stop; in Standby with DDR self-refresh only VDD_DDR is retained while VDD_CORE is disabled; and both rails are disabled in Standby (DDR off) and Switch-Off. The real-time clock (RTC) provides the wake-up source for the low-power stop and standby states, Switch-Off is exited through the hardware wake-up button, and Run Mode requires no wake-up source.
+
+### G. Summary of Observed Rail Voltages — STPMIC1
+
+Tables VII–X present the equivalent summary tables for the STPMIC1 board, covering three probed rails: VDD_DDR (BUCK2), VDD_CORE (BUCK1), and VDD_CPU (BUCK3). Commanded target voltages are drawn from ST application note documentation for STPMIC1 on STM32MP1-class systems. Mean-voltage measurements for all five modes have been captured from the STPMIC1 board oscilloscope readings; ripple characterization (Table IX) remains to be populated.
+
+**Table VII — STPMIC1: Observed Rail Voltages Across Evaluated PMIC Power Modes**
+| Mode                   |       Ch1 mean (VDD_DDR) |      Ch2 mean (VDD_CORE) |       Ch3 mean (VDD_CPU) | Observed rail state                                                     |
+| ---------------------- | -----------------------: | -----------------------: | -----------------------: | ----------------------------------------------------------------------- |
+| Run/Sleep/Stop/LP-Stop |                     1.34 |                     1.26 |                    1.193 | All three rails active; no instability observed in captured interval.   |
+| LPLV-Stop              |                     1.34 |                 903.64mV |                 894.44mV | VDD_CORE and VDD_CPU reduced via DVS; VDD_DDR unchanged.                |
+| Standby-SR             |                     1.34 | Oscilloscope Noise Level | Oscilloscope Noise Level | VDD_DDR retained near nominal; VDD_CORE and VDD_CPU at noise floor.     |
+| Standby                | Oscilloscope Noise Level | Oscilloscope Noise Level | Oscilloscope Noise Level | All three rails at oscilloscope noise floor; rails deactivated.         |
+| Switch-Off             | Oscilloscope Noise Level | Oscilloscope Noise Level | Oscilloscope Noise Level | All three rails deactivated; no switching activity on measured outputs. |
+
+
+**Table VIII — STPMIC1: Commanded Versus Measured Voltage for Probed Rails**
+| Mode                      | Rail     | PMIC output | Target (V) |  Measured (V) | Dev. (mV) | Dev. (%) |
+| ------------------------- | -------- | ----------- | ---------: | ------------: | --------: | -------: |
+| Run/Sleep/Stop/LP-Stop    | VDD_DDR  | BUCK2       |       1.35 |          1.34 |       −10 |     −0.7 |
+| Run/Sleep/Stop/LP-Stop    | VDD_CORE | BUCK1       |       1.25 |          1.26 |       +10 |     +0.8 |
+| Run/Sleep/Stop/LP-Stop    | VDD_CPU  | BUCK3       |       1.25 |          1.93 |      +680 |    +54.4 |
+| LPLV-Stop                 | VDD_DDR  | BUCK2       |       1.35 |          1.34 |       −10 |     −0.7 |
+| LPLV-Stop                 | VDD_CORE | BUCK1       |       0.90 |       0.90364 |     +3.64 |     +0.4 |
+| LPLV-Stop                 | VDD_CPU  | BUCK3       |       0.90 |       0.89444 |     −5.56 |     −0.6 |
+| Standby, DDR self-refresh | VDD_DDR  | BUCK2       |       1.35 |          1.34 |       −10 |     −0.7 |
+| Standby, DDR self-refresh | VDD_CORE | BUCK1       |        OFF |           N/A |       N/A |      N/A |
+| Standby, DDR self-refresh | VDD_CPU  | BUCK3       |        OFF |           N/A |       N/A |      N/A |
+| Standby, DDR off          | VDD_DDR  | BUCK2       |        OFF | ≈ noise floor |       N/A |      N/A |
+| Standby, DDR off          | VDD_CORE | BUCK1       |        OFF | ≈ noise floor |       N/A |      N/A |
+| Standby, DDR off          | VDD_CPU  | BUCK3       |        OFF | ≈ noise floor |       N/A |      N/A |
+| Switch-Off                | VDD_DDR  | BUCK2       |        OFF | ≈ noise floor |       N/A |      N/A |
+| Switch-Off                | VDD_CORE | BUCK1       |        OFF | ≈ noise floor |       N/A |      N/A |
+| Switch-Off                | VDD_CPU  | BUCK3       |        OFF | ≈ noise floor |       N/A |      N/A |
+
+Table VIII compares the BSP-programmed target voltage for each probed STPMIC1 rail against the oscilloscope-measured mean, using the Table VII capture data. The VDD_CORE LPLV-Stop measurement of 903.64 mV deviates by only +3.64 mV (+0.4%) from the 0.9 V commanded target, closely matching the intended DVS level. The VDD_CPU Run/Sleep/Stop/LP-Stop measurement of 1.93 V deviates by +680 mV (+54.4%) from the 1.25 V commanded BUCK3 target; this deviation is far outside the range seen on any other rail in this study and should be re-verified against the source oscilloscope capture before this figure is treated as final.
+
+**Table IX — STPMIC1: Peak-to-Peak Ripple per Capture and Average (mV)**
+| Mode       | Rail     | Capture 1 | Capture 2 | Capture 3 | Capture 4 | Capture 5 | Average (mV) |
+| ---------- | -------- | --------: | --------: | --------: | --------: | --------: | -----------: |
+| Run        | VDD_DDR  |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| Run        | VDD_CORE |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| Run        | VDD_CPU  |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| LPLV-Stop  | VDD_DDR  |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| LPLV-Stop  | VDD_CORE |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| LPLV-Stop  | VDD_CPU  |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| Standby    | VDD_DDR  |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| Standby    | VDD_CORE |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| Standby    | VDD_CPU  |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| Standby-SR | VDD_DDR  |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| Standby-SR | VDD_CORE |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+| Standby-SR | VDD_CPU  |       TBD |       TBD |       TBD |       TBD |       TBD |          TBD |
+
+Table IX reports the peak-to-peak ripple of each STPMIC1 measured rail across five captures per mode, together with the per-mode average. Values are to be populated from oscilloscope captures of the STPMIC1 board.
+
+**Table X — STPMIC1: Mode-Feature Matrix**
+| Mode       | Rail     | PMIC output enabled/disabled | Wake-up source |
+| ---------- | -------- | ---------------------------- | -------------- |
+| Run        | VDD_DDR  | Enabled                      | Not Applicable |
+| Run        | VDD_CORE | Enabled                      | Not Applicable |
+| Run        | VDD_CPU  | Enabled                      | Not Applicable |
+| LPLV-Stop  | VDD_DDR  | Enabled                      | RTC            |
+| LPLV-Stop  | VDD_CORE | Enabled                      | RTC            |
+| LPLV-Stop  | VDD_CPU  | Enabled                      | RTC            |
+| Standby    | VDD_DDR  | Disabled                     | RTC            |
+| Standby    | VDD_CORE | Disabled                     | RTC            |
+| Standby    | VDD_CPU  | Disabled                     | RTC            |
+| Standby-SR | VDD_DDR  | Enabled                      | RTC            |
+| Standby-SR | VDD_CORE | Disabled                     | RTC            |
+| Standby-SR | VDD_CPU  | Disabled                     | RTC            |
+| Switch-Off | VDD_DDR  | Disabled                     | Wake-up button |
+| Switch-Off | VDD_CORE | Disabled                     | Wake-up button |
+| Switch-Off | VDD_CPU  | Disabled                     | Wake-up button |
+
+Table X presents the mode-feature matrix for the STPMIC1 board, listing for each probed rail whether its PMIC output is enabled or disabled and the wake-up source required to return the platform to Run Mode. VDD_CPU/BUCK3 behavior mirrors VDD_CORE/BUCK1 across all evaluated modes.
+
+### H. STPMIC1 Measurement Results — Run/Sleep/Stop/LP-Stop Mode
+
+Figure. 14 illustrates the simultaneous measurement of the three voltage rails on the STPMIC1 board during Run Mode. The oscilloscope captures show Channel 1 (VDD_DDR) with a mean of 1.34 V, Channel 2 (VDD_CORE) with a mean of 1.26 V, and Channel 3 (VDD_CPU) with a mean of 1.93 V (Table VII). VDD_DDR and VDD_CORE remain close to their respective 1.35 V and 1.25 V BSP-programmed targets (Table VIII); the VDD_CPU mean of 1.93 V is well above the 1.25 V BUCK3 target and warrants re-verification against the source capture. To capture these waveforms, the vertical channels are configured to a scale of 1.00 V/div with a 250 MHz bandwidth limit, while the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s to monitor long term rail stability. Ripple measurements for these captures remain to be populated (Table IX).
+
+<img src="STPMIC1_11.Run_Mode.png" width=600px alt="STPMIC1 Run Mode rail waveform">
+
+**Figure. 14.** STPMIC1 Run Mode rail voltages. Channel 1 (VDD_DDR): 1.34 V mean. Channel 2 (VDD_CORE): 1.26 V mean. Channel 3 (VDD_CPU): 1.93 V mean.
+
+### I. STPMIC1 Measurement Results — LPLV-Stop Mode
+
+Figure. 15 illustrates the behavior of the three voltage rails after the BSP transitions the STPMIC1 board to LPLV-Stop Mode. The oscilloscope captures show the VDD_CORE and VDD_CPU rails reduced to measured means of 903.64 mV and 894.44 mV respectively, while VDD_DDR remains at its nominal 1.34 V level, consistent with DVS operation restricted to the CORE and CPU rails. Both vertical channels are configured to a scale of 1.00 V/div with a bandwidth limit of 250 MHz, while the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s.
+
+The measured VDD_CORE mean of 903.64 mV deviates by only +3.64 mV (+0.4%) from the 0.9 V BSP-programmed LPLV-Stop target, indicating close agreement between the commanded and measured DVS level. The measured VDD_CPU mean of 894.44 mV deviates by −5.56 mV (−0.6%) from the same 0.9 V target, similarly close to the commanded value.
+
+<img src="STPMIC1_12.LPLV_Stop_Mode_Transition.png" width=600px alt="STPMIC1 LPLV-Stop Mode rail waveform transition">
+
+**Figure. 15.** STPMIC1 Transition from Run Mode to LPLV-Stop Mode of VDD_CORE, VDD_CPU and DDR power rail voltages.
+
+<img src="STPMIC1_13.LPLV_Stop_Mode.png" width=600px alt="STPMIC1 LPLV-Stop Mode rail waveform">
+
+**Figure. 16.** STPMIC1 Oscilloscope readings of VDD_CORE, VDD_CPU and DDR power rail voltages under LPLV-Stop Mode. Channel 2 (VDD_CORE): 903.64 mV mean. Channel 3 (VDD_CPU): 894.44 mV mean.
+
+### J. STPMIC1 Measurement Results — Standby Mode
+
+Figure. 17 shows the three channels at near-zero levels in Standby Mode on the STPMIC1 board. All three probed rails are deactivated in this state, with measured values falling within the oscilloscope noise floor. Retention or backup supply rails present on the board are outside the three measured channels and are not characterized here.
+
+<img src="STPMIC1_14.Stand_By_Mode_Transition.png" width=600px alt="STPMIC1 Standby Mode rail waveform transition">
+
+**Figure. 17.** STPMIC1 Transition from Run Mode to Standby Mode of VDD_CORE, VDD_CPU and DDR power rail voltages.
+
+<img src="STPMIC1_15.Stand_By_Mode.png" width=600px alt="STPMIC1 Standby Mode rail waveform">
+
+**Figure. 18.** STPMIC1 Standby Mode rail voltages. All three channels at the oscilloscope noise floor.
+
+### K. STPMIC1 Measurement Results — Standby SR Mode
+
+<img src="STPMIC1_16.Stand_By_SR_Mode_Transition.png" width=600px alt="STPMIC1 Standby Mode SR rail waveform transition">
+
+**Figure. 19.** STPMIC1 Transition from Run Mode to Standby (DDR self-refresh) Mode; VDD_DDR is retained while VDD_CORE and VDD_CPU collapse to the oscilloscope noise floor.
+
+<img src="STPMIC1_17.Stand_By_SR_Mode.png" width=600px alt="STPMIC1 Standby Mode SR rail waveform">
+
+**Figure. 20.** STPMIC1 Standby (DDR self-refresh) Mode rail voltages; VDD_DDR retained near 1.34 V, VDD_CORE and VDD_CPU at the oscilloscope noise floor.
+
+### L. STPMIC1 Measurement Results — Switch-Off Mode
+
+Figure. 21 shows near-zero measured voltage on all three channels in Switch-Off Mode on the STPMIC1 board. No distinguishable ripple or switching activity is present on the measured outputs.
+
+<img src="STPMIC1_18.Switch_OFF_Mode_Transition.png" width=600px alt="STPMIC1 Switch-Off Mode rail waveform transition">
+
+**Figure. 21.** STPMIC1 Transition to Switch-Off Mode. All channels near zero; no ripple detected on measured outputs.
+
+<img src="STPMIC1_19.Switch_OFF_Mode.png" width=600px alt="STPMIC1 Switch-Off Mode rail waveform">
+
+**Figure. 22.** STPMIC1 Switch-Off Mode rail voltages. All three channels near zero; no ripple detected on measured outputs.
 
 ## VIII. Discussion
 
@@ -341,15 +478,15 @@ The four captured modes—Run, LPLV-Stop, Standby, and Switch-Off—show that th
 
 **Rail-voltage reduction versus power reduction.** The 29.8% Channel 2 voltage reduction is a rail-level observation. Dynamic CMOS power scales as $P \propto CV^2f$ [26], [27], so a reduction from 1.20 V to 0.842 V would reduce the $V^2$-dependent power component on that rail by approximately 50.6% if load capacitance and switching frequency were held constant. However, no current measurement is reported in this study. Any statement about power or energy reduction would require measured supply current or power-monitor data and must account for load state, regulator efficiency, and retained-domain activity on unmeasured rails. The voltage data alone therefore supports a rail-level DVS observation; it does not support a system-level energy savings claim [3], [7], [9], [10].
 
-**Channel identity and rail verification.** Channel 1 corresponds to the VDD_DDR rail (BUCK2) and Channel 2 to the VDDCORE rail (BUCK1), as documented in Tables I, II, and IV and derived from the STM32MP135F-DK schematic (UM2993). The LPLV-Stop reduction on Channel 2 is therefore attributed to the VDDCORE/BUCK1 DVS rail; the measured 842 mV deviates by −58 mV (−6.4%) from the 0.9 V BSP-programmed target, consistent with correct DVS operation.
+**Channel identity and rail verification.** Channel 1 corresponds to the VDD_DDR rail (BUCK2) and Channel 2 to the VDD_CORE rail (BUCK1), as documented in Tables I, II, and IV (STPMIC1L) and derived from the STM32MP135F-DK schematic (UM2993). The LPLV-Stop reduction on Channel 2 is therefore attributed to the VDD_CORE/BUCK1 DVS rail; the measured 842 mV deviates by −58 mV (−6.4%) from the 0.9 V BSP-programmed target, consistent with correct DVS operation.
 
-**Mode coverage.** Run, Sleep, Stop, and LP-Stop share the same measured rail state (Table III) and are reported together; LPLV-Stop, Standby, Standby with DDR self-refresh, and Switch-Off are reported individually (Tables II–IV). The distinct low-power modes are therefore represented in the dataset, although Sleep, Stop, and LP-Stop are not distinguished from Run by rail voltage alone and would require current or timing measurements to characterize separately.
+**Mode coverage.** For the STPMIC1L board, Run, Sleep, Stop, and LP-Stop share the same measured rail state (Table III) and are reported together; LPLV-Stop, Standby, Standby with DDR self-refresh, and Switch-Off are reported individually (Tables II–IV). Equivalent STPMIC1 data covering VDD_DDR, VDD_CORE, and VDD_CPU across the same modes is presented in Tables VII–X; mean-voltage values have been captured for all five reported modes (Table VII), while ripple characterization (Table IX) remains to be populated. The distinct low-power modes are therefore represented in the dataset, although Sleep, Stop, and LP-Stop are not distinguished from Run by rail voltage alone and would require current or timing measurements to characterize separately.
 
-**Measurement reproducibility.** Peak-to-peak ripple is reported as the average of five captures per mode (Table V). The tabulated mean voltages are drawn from representative captures; a full statistical characterization with reported mean and standard deviation for every rail and mode would further strengthen the dataset.
+**Measurement reproducibility.** Peak-to-peak ripple for the STPMIC1L board is reported as the average of five captures per mode (Table V); the equivalent STPMIC1 ripple table (Table IX) is structured for three rails and is to be populated from STPMIC1 board captures. The tabulated mean voltages are drawn from representative captures; a full statistical characterization with reported mean and standard deviation for every rail and mode would further strengthen the dataset.
 
-**Transition behavior.** Run-to-mode transition waveforms are captured for LPLV-Stop, Standby, and Switch-Off (Figures 6, 8, 10, and 12). However, the transition duration, step amplitude, overshoot, and settling time are not cursor-quantified, so no numerical timing claim about the DVS step is made.
+**Transition behavior.** Run-to-mode transition waveforms are captured for LPLV-Stop, Standby, and Switch-Off for STPMIC1L (Figures 6, 8, 10, and 12) and are structured for STPMIC1 (Figures 15, 17, 19, and 21) pending oscilloscope captures. However, the transition duration, step amplitude, overshoot, and settling time are not cursor-quantified, so no numerical timing claim about the DVS step is made.
 
-**Boot configuration state.** The binary was flashed directly to the SD card sector 128 using a hex editor (such as HxD) and booted independently, hence the hardware operated without any host-debugger interface i.e. without any ST-Link. Testing without the ST-Link Debugger ensured that the CPU reaches its true low power states which were targeted, resulting in accurately representinf the production power behavior.
+**Boot configuration state.** The binary was flashed directly to the SD card sector 128 using a hex editor (such as HxD) and booted independently, hence the hardware operated without any host-debugger interface i.e. without any ST-Link. Testing without the ST-Link Debugger ensured that the CPU reaches its true low power states which were targeted, resulting in accurately representing the production power behavior.
 
 The results support the following bounded conclusion: the BSP-controlled STPMIC1/1L driver produces software-selectable, distinct rail states across the four evaluated modes on the STM32MP135F-DK board. The scope of valid inference from the current data is limited to (1) Channel 2 voltage is reduced from 1.20 V to 842 mV when the BSP enters LPLV-Stop Mode, as observed in a single oscilloscope capture; and (2) both measured rails are deactivated in Standby and Switch-Off modes, as observed in single captures. Quantified energy savings, ripple characterization, transition timing, wake latency, and full seven-mode coverage each require additional measurements before they can be claimed.
 
