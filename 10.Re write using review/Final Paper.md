@@ -361,7 +361,7 @@ Tables VII–X present the equivalent summary tables for the STPMIC1 board, cove
 | ------------------------- | -------- | ----------- | ---------: | ------------: | --------: | -------: |
 | Run/Sleep/Stop/LP-Stop    | VDD_DDR  | BUCK2       |       1.35 |          1.34 |       −10 |     −0.7 |
 | Run/Sleep/Stop/LP-Stop    | VDD_CORE | BUCK1       |       1.25 |          1.26 |       +10 |     +0.8 |
-| Run/Sleep/Stop/LP-Stop    | VDD_CPU  | BUCK3       |       1.25 |          1.93 |      +680 |    +54.4 |
+| Run/Sleep/Stop/LP-Stop    | VDD_CPU  | BUCK3       |       1.25 |          1.193 |       −57 |     −4.6 |
 | LPLV-Stop                 | VDD_DDR  | BUCK2       |       1.35 |          1.34 |       −10 |     −0.7 |
 | LPLV-Stop                 | VDD_CORE | BUCK1       |       0.90 |       0.90364 |     +3.64 |     +0.4 |
 | LPLV-Stop                 | VDD_CPU  | BUCK3       |       0.90 |       0.89444 |     −5.56 |     −0.6 |
@@ -375,7 +375,7 @@ Tables VII–X present the equivalent summary tables for the STPMIC1 board, cove
 | Switch-Off                | VDD_CORE | BUCK1       |        OFF | ≈ noise floor |       N/A |      N/A |
 | Switch-Off                | VDD_CPU  | BUCK3       |        OFF | ≈ noise floor |       N/A |      N/A |
 
-Table VIII compares the BSP-programmed target voltage for each probed STPMIC1 rail against the oscilloscope-measured mean, using the Table VII capture data. The VDD_CORE LPLV-Stop measurement of 903.64 mV deviates by only +3.64 mV (+0.4%) from the 0.9 V commanded target, closely matching the intended DVS level. The VDD_CPU Run/Sleep/Stop/LP-Stop measurement of 1.93 V deviates by +680 mV (+54.4%) from the 1.25 V commanded BUCK3 target; this deviation is far outside the range seen on any other rail in this study and should be re-verified against the source oscilloscope capture before this figure is treated as final.
+Table VIII compares the BSP-programmed target voltage for each probed STPMIC1 rail against the oscilloscope-measured mean, using the Table VII capture data. The VDD_CORE LPLV-Stop measurement of 903.64 mV deviates by only +3.64 mV (+0.4%) from the 0.9 V commanded target, closely matching the intended DVS level. The VDD_CPU Run/Sleep/Stop/LP-Stop measurement of 1.193 V deviates by −57 mV (−4.6%) from the 1.25 V commanded BUCK3 target, a deviation comparable in magnitude to the other measured rails in this study.
 
 **Table IX — STPMIC1: Peak-to-Peak Ripple per Capture and Average (mV)**
 | Mode       | Rail     | Capture 1 | Capture 2 | Capture 3 | Capture 4 | Capture 5 | Average (mV) |
@@ -418,11 +418,11 @@ Table X presents the mode-feature matrix for the STPMIC1 board, listing for each
 
 ### H. STPMIC1 Measurement Results — Run/Sleep/Stop/LP-Stop Mode
 
-Figure. 14 illustrates the simultaneous measurement of the three voltage rails on the STPMIC1 board during Run Mode. The oscilloscope captures show Channel 1 (VDD_DDR) with a mean of 1.34 V, Channel 2 (VDD_CORE) with a mean of 1.26 V, and Channel 3 (VDD_CPU) with a mean of 1.93 V (Table VII). VDD_DDR and VDD_CORE remain close to their respective 1.35 V and 1.25 V BSP-programmed targets (Table VIII); the VDD_CPU mean of 1.93 V is well above the 1.25 V BUCK3 target and warrants re-verification against the source capture. To capture these waveforms, the vertical channels are configured to a scale of 1.00 V/div with a 250 MHz bandwidth limit, while the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s to monitor long term rail stability. Ripple measurements for these captures remain to be populated (Table IX).
+Figure. 14 illustrates the simultaneous measurement of the three voltage rails on the STPMIC1 board during Run Mode. The oscilloscope captures show Channel 1 (VDD_DDR) with a mean of 1.34 V, Channel 2 (VDD_CORE) with a mean of 1.26 V, and Channel 3 (VDD_CPU) with a mean of 1.193 V (Table VII). All three rails remain close to their respective 1.35 V, 1.25 V, and 1.25 V BSP-programmed targets (Table VIII). To capture these waveforms, the vertical channels are configured to a scale of 1.00 V/div with a 250 MHz bandwidth limit, while the horizontal time base is set to 10.0 ms/div at a sampling rate of 100 kS/s to monitor long term rail stability. Ripple measurements for these captures remain to be populated (Table IX).
 
 <img src="STPMIC1_11.Run_Mode.png" width=600px alt="STPMIC1 Run Mode rail waveform">
 
-**Figure. 14.** STPMIC1 Run Mode rail voltages. Channel 1 (VDD_DDR): 1.34 V mean. Channel 2 (VDD_CORE): 1.26 V mean. Channel 3 (VDD_CPU): 1.93 V mean.
+**Figure. 14.** STPMIC1 Run Mode rail voltages. Channel 1 (VDD_DDR): 1.34 V mean. Channel 2 (VDD_CORE): 1.26 V mean. Channel 3 (VDD_CPU): 1.193 V mean.
 
 ### I. STPMIC1 Measurement Results — LPLV-Stop Mode
 
